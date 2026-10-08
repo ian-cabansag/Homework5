@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Campus Customs — Ticket Plan</title>
+  <style>
+    :root {
+      --ink: #242326;
+      --muted: #767078;
+      --faint: #a29ba0;
+      --paper: #f7f4f2;
+      --surface: #fffefd;
+      --line: #e9e2e0;
+      --rose: #b64d70;
+      --rose-dark: #87354f;
+      --rose-wash: #f8edf1;
+      --sage: #547566;
+      --sage-wash: #edf3ef;
+      --amber: #9c6b31;
+      --amber-wash: #f7f0e6;
+      --shadow: 0 18px 50px rgba(43, 31, 37, .055);
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--paper); }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 94% -4%, rgba(207, 140, 162, .13), transparent 32rem),
+        var(--paper);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; }
+    .shell { width: min(1120px, calc(100% - 48px)); margin: 0 auto; padding: 34px 0 56px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 43px; }
+    .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; }
+    .brand-mark {
+      display: grid; width: 36px; height: 36px; place-items: center;
+      border: 1px solid #e7cbd4; border-radius: 12px; color: var(--rose-dark);
+      background: #fff9fb; font-family: var(--serif); font-size: 20px; font-weight: 600;
+    }
+    .brand-name { font-size: 12px; font-weight: 720; letter-spacing: .11em; text-transform: uppercase; }
+    .brand-sub { display: block; margin-top: 1px; color: var(--muted); font-size: 11px; font-weight: 450; letter-spacing: .015em; text-transform: none; }
+    .top-meta { display: flex; align-items: center; gap: 10px; }
+    .meta-label { color: var(--muted); font-size: 11px; letter-spacing: .04em; }
+    .live-dot { display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--sage); vertical-align: 1px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; min-height: 25px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 99px; color: #5f5960; background: rgba(255,254,253,.78); font-size: 10px; font-weight: 700; letter-spacing: .055em; text-transform: uppercase; white-space: nowrap; }
+    .pill.rose { border-color: #ebd2dc; color: var(--rose-dark); background: var(--rose-wash); }
+    .pill.sage { border-color: #d9e5dd; color: #426251; background: var(--sage-wash); }
+    .pill.amber { border-color: #ebdfca; color: #805522; background: var(--amber-wash); }
+
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 28px; }
+    .eyebrow { margin: 0 0 9px; color: var(--rose); font: 700 10px/1.3 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+    h1 { max-width: 670px; margin: 0; font-family: var(--serif); font-size: clamp(34px, 5vw, 49px); font-weight: 500; letter-spacing: -.045em; line-height: 1.08; }
+    .intro-copy { max-width: 600px; margin: 13px 0 0; color: var(--muted); font-size: 13px; }
+    .summary-card { display: flex; min-width: 158px; align-items: center; gap: 13px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,254,253,.72); }
+    .summary-number { color: var(--rose-dark); font: 500 25px/1 var(--serif); }
+    .summary-text { color: var(--muted); font-size: 10px; line-height: 1.35; }
+
+    .desk { overflow: hidden; border: 1px solid #e8e0de; border-radius: 19px; background: var(--surface); box-shadow: var(--shadow); }
+    .tabbar { display: flex; align-items: center; gap: 4px; overflow-x: auto; padding: 13px 16px 0; border-bottom: 1px solid var(--line); background: #fdfbf9; scrollbar-width: thin; }
+    .tab {
+      position: relative; display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px;
+      min-height: 47px; padding: 0 15px; border: 0; border-radius: 10px 10px 0 0;
+      color: #777078; background: transparent; cursor: pointer; font-size: 12px; font-weight: 620;
+      transition: color .18s ease, background .18s ease;
+    }
+    .tab:hover { color: var(--ink); background: #f7f0f1; }
+    .tab[aria-selected="true"] { color: var(--rose-dark); background: var(--rose-wash); }
+    .tab[aria-selected="true"]::after { position: absolute; right: 12px; bottom: -1px; left: 12px; height: 2px; border-radius: 2px 2px 0 0; background: var(--rose); content: ""; }
+    .tab-index { color: #a69ca2; font: 10px var(--mono); }
+    .tab[aria-selected="true"] .tab-index { color: var(--rose); }
+    .tab-panel { padding: clamp(22px, 4vw, 38px); }
+    .tab-panel[hidden] { display: none; }
+
+    .ticket-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .ticket-kicker { margin: 0 0 7px; color: var(--muted); font: 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    h2 { margin: 0; font-family: var(--serif); font-size: clamp(25px, 3vw, 32px); font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
+    .requester { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+    .ticket-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; max-width: 460px; }
+
+    .section-title { display: flex; align-items: center; gap: 10px; margin: 26px 0 14px; }
+    .section-title h3 { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .section-rule { height: 1px; flex: 1; background: var(--line); }
+    .expected-label { color: var(--rose); font: 700 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
+    .route { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+    .route-card { min-height: 157px; padding: 16px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .route-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+    .route-step { color: var(--faint); font: 10px var(--mono); }
+    .role { color: var(--rose-dark); font-size: 11px; font-weight: 760; }
+    .route-card h4 { margin: 0 0 6px; font-size: 13px; font-weight: 680; letter-spacing: -.01em; }
+    .route-card p { margin: 0; color: var(--muted); font-size: 11.5px; line-height: 1.6; }
+    .route-card.first { border-color: #e8cad4; background: linear-gradient(145deg, #fffafb, #fff 76%); }
+    .route-card.first .route-step { color: var(--rose); }
+
+    .lower-grid { display: grid; grid-template-columns: 1.02fr .98fr; gap: 14px; margin-top: 15px; }
+    .info-box { min-width: 0; padding: 17px 18px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .box-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .box-head h4 { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .085em; text-transform: uppercase; }
+    .box-head span { color: var(--faint); font: 9px var(--mono); }
+    .tool-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .tool-list li { display: grid; grid-template-columns: 16px minmax(0,1fr); gap: 8px; align-items: start; color: var(--muted); font-size: 11px; }
+    .tool-bullet { color: var(--rose); font: 12px var(--mono); }
+    code { color: #51464d; font: 10px/1.5 var(--mono); overflow-wrap: anywhere; }
+    .flow-list { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; counter-reset: flow; }
+    .flow-list li { position: relative; display: grid; grid-template-columns: 22px 1fr; gap: 9px; color: var(--muted); font-size: 11.5px; }
+    .flow-list li::before { display: grid; width: 20px; height: 20px; place-items: center; border: 1px solid #ecd7de; border-radius: 50%; color: var(--rose-dark); background: #fff9fb; content: counter(flow); counter-increment: flow; font: 9px var(--mono); }
+    .flow-list strong { color: var(--ink); font-weight: 700; }
+    .approval-note { display: flex; gap: 10px; align-items: flex-start; margin-top: 13px; padding: 11px 12px; border: 1px solid #eee1cd; border-radius: 10px; color: #775a36; background: #fcf8f1; font-size: 10.5px; line-height: 1.5; }
+    .approval-icon { flex: 0 0 auto; color: var(--amber); font-size: 13px; }
+    .fact-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+    .fact { padding: 7px 10px; border: 1px solid #eee8e6; border-radius: 9px; color: #645c62; background: #fcfaf9; font-size: 10.5px; }
+    .fact strong { color: var(--ink); font-weight: 740; }
+
+    .actual-title { margin-top: 31px; }
+    .actual-slot { display: flex; min-height: 84px; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; border: 1px dashed #d9ced0; border-radius: 12px; background: repeating-linear-gradient(135deg, #fdfbfa, #fdfbfa 12px, #fbf8f7 12px, #fbf8f7 24px); }
+    .actual-slot strong { display: block; color: #696168; font-size: 12px; font-weight: 700; }
+    .actual-slot p { margin: 4px 0 0; color: var(--muted); font-size: 10.5px; }
+    .reserved { color: #978c92; font: 9px var(--mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .source-note { display: flex; justify-content: space-between; gap: 14px; margin-top: 18px; color: #999197; font-size: 9.5px; }
+    .source-note code { color: #81767d; font-size: 9px; }
+
+    .coming { display: grid; min-height: 390px; place-items: center; padding: 30px; text-align: center; }
+    .coming-inner { max-width: 370px; }
+    .coming-mark { display: grid; width: 46px; height: 46px; margin: 0 auto 17px; place-items: center; border: 1px solid #ead9df; border-radius: 15px; color: var(--rose); background: #fff9fb; font: 18px var(--serif); }
+    .coming h2 { font-size: 27px; }
+    .coming p { margin: 9px 0 15px; color: var(--muted); font-size: 12px; }
+    .reflection-page { max-width: 1040px; margin: 0 auto; }
+    .reflection-intro { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .reflection-intro .eyebrow { margin-bottom: 7px; }
+    .reflection-intro h2 { font-size: clamp(26px, 3.4vw, 35px); }
+    .reflection-intro p { max-width: 720px; margin: 9px 0 0; color: var(--muted); font-size: 12px; }
+    .reflection-status { display: flex; align-items: flex-start; gap: 11px; margin-top: 17px; padding: 13px 15px; border: 1px solid #eadfca; border-radius: 11px; color: #785d3e; background: #fcf8f1; font-size: 11px; line-height: 1.6; }
+    .reflection-status .pill { flex: 0 0 auto; margin-top: 1px; }
+    .reflection-section { margin-top: 27px; }
+    .reflection-stack { display: grid; gap: 12px; }
+    .reflection-card { padding: 18px 19px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .reflection-card-head { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 13px; border-bottom: 1px solid #f0ecea; }
+    .reflection-id { display: grid; flex: 0 0 auto; width: 34px; height: 34px; place-items: center; border: 1px solid #e8d6dc; border-radius: 10px; color: var(--rose-dark); background: #fbf3f5; font: 11px var(--mono); }
+    .reflection-card-head h4 { margin: 1px 0 3px; font-size: 13px; font-weight: 730; }
+    .reflection-card-head p { margin: 0; color: var(--muted); font-size: 10.5px; }
+    .reflection-card-head .pill { margin-left: auto; }
+    .reflection-points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; padding-top: 14px; }
+    .reflection-points h5 { margin: 0 0 6px; color: #51474d; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .reflection-points p { margin: 0; color: #716b70; font-size: 10.5px; line-height: 1.65; }
+    .reflection-points code { font-size: 9px; }
+    .reflection-takeaway { display: flex; align-items: flex-start; gap: 8px; margin-top: 13px; padding: 10px 11px; border-radius: 8px; color: #586d5f; background: #f2f6f2; font-size: 10px; line-height: 1.55; }
+    .reflection-takeaway strong { color: #42574a; }
+    .reflection-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .reflection-box { padding: 17px 18px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .reflection-box h4 { margin: 0 0 9px; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+    .reflection-box p, .reflection-box li { color: #716b70; font-size: 10.5px; line-height: 1.65; }
+    .reflection-box p:last-child { margin-bottom: 0; }
+    .reflection-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .reflection-list li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+    .reflection-list li::before { display: grid; width: 19px; height: 19px; place-items: center; border: 1px solid #e9d8dd; border-radius: 50%; color: var(--rose-dark); background: #fff8fa; content: counter(list-item); font: 8px var(--mono); }
+    .reflection-ledger { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+    .reflection-ledger .fact { font-size: 9px; }
+    .reflection-ledger .fact strong { margin-left: 3px; }
+    .footer { display: flex; justify-content: space-between; gap: 16px; padding: 17px 4px 0; color: #928a90; font-size: 10px; }
+    .footer .mono { font: 9px var(--mono); letter-spacing: .04em; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 620px); padding-top: 21px; }
+      .topline { margin-bottom: 31px; }
+      .intro { align-items: flex-start; }
+      .summary-card { display: none; }
+      .ticket-head { flex-direction: column; }
+      .ticket-pills { justify-content: flex-start; }
+      .route { grid-template-columns: 1fr; }
+      .route-card { min-height: unset; }
+      .lower-grid { grid-template-columns: 1fr; }
+      .reflection-points, .reflection-two { grid-template-columns: 1fr; }
+      .reflection-card { padding: 15px; }
+      .reflection-card-head { flex-wrap: wrap; }
+      .reflection-card-head .pill { margin-left: 46px; }
+      .reflection-status { flex-direction: column; }
+      .tab-panel { padding: 20px 17px 25px; }
+      .source-note { flex-direction: column; gap: 5px; }
+    }
+    @media (max-width: 430px) {
+      .top-meta .meta-label { display: none; }
+      .brand-name { font-size: 10px; }
+      .tabbar { padding-left: 8px; }
+      .tab { padding: 0 11px; font-size: 11px; }
+      .actual-slot { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topline">
+      <a class="brand" href="#top" aria-label="Campus Customs operations desk">
+        <span class="brand-mark" aria-hidden="true">C</span>
+        <span class="brand-name">Campus Customs<span class="brand-sub">Operations desk</span></span>
+      </a>
+      <div class="top-meta">
+        <span class="meta-label"><span class="live-dot"></span>Planning view</span>
+        <span class="pill rose">Pre-run</span>
+      </div>
+    </header>
+
+    <section class="intro" id="top" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Ticket review / 06</p>
+        <h1 id="page-title">A considered plan<br>before the work begins.</h1>
+        <p class="intro-copy">Evidence-led plans beside the actual bounded agent runs. Ticket-level reflection and run evidence are summarized in the Reflection tab and append-only audit trail.</p>
+      </div>
+      <div class="summary-card" aria-label="Three open tickets">
+        <span class="summary-number">03</span>
+        <span class="summary-text">open tickets<br>one at a time</span>
+      </div>
+    </section>
+
+    <section class="desk" aria-label="Ticket planning tabs">
+      <div class="tabbar" role="tablist" aria-label="Operations desk sections">
+        <button class="tab" id="tab-101" role="tab" aria-selected="true" aria-controls="panel-101" tabindex="0"><span class="tab-index">01</span>Ticket 101</button>
+        <button class="tab" id="tab-102" role="tab" aria-selected="false" aria-controls="panel-102" tabindex="-1"><span class="tab-index">02</span>Ticket 102</button>
+        <button class="tab" id="tab-103" role="tab" aria-selected="false" aria-controls="panel-103" tabindex="-1"><span class="tab-index">03</span>Ticket 103</button>
+        <button class="tab" id="tab-cash" role="tab" aria-selected="false" aria-controls="panel-cash" tabindex="-1"><span class="tab-index">04</span>Cash</button>
+        <button class="tab" id="tab-reflection" role="tab" aria-selected="false" aria-controls="panel-reflection" tabindex="-1"><span class="tab-index">05</span>Reflection</button>
+      </div>
+
+      <section class="tab-panel" id="panel-101" role="tabpanel" aria-labelledby="tab-101" tabindex="0">
+        <header class="ticket-head">
+          <div><p class="ticket-kicker">Open ticket · 101 · Customer order</p><h2>Bulldog tee, size S</h2><p class="requester">Requested by Tauhid Zaman · one tee</p></div>
+          <div class="ticket-pills"><span class="pill sage">Open</span><span class="pill rose">0 in size S</span><span class="pill">Invoice 501 · open</span></div>
+        </header>
+        <div class="section-title"><h3>Expected</h3><span class="expected-label">Planned route</span><span class="section-rule"></span></div>
+        <div class="route">
+          <article class="route-card first"><div class="route-top"><span class="route-step">01 / FIRST</span><span class="role">Inventory</span></div><h4>Confirm the shortfall</h4><p>Ticket 101 needs one white tee in S; the database shows zero. Trace the linked reprint and verify Bulldog Print Co’s current shipment eligibility.</p></article>
+          <article class="route-card"><div class="route-top"><span class="route-step">02 / FINANCIAL CHECK</span><span class="role">Accounting</span></div><h4>Check the existing invoice</h4><p>Invoice 501 is open for $840 and past its recorded due date. Compare it with rent due soon, then obtain a fresh database quote before proposing payment.</p></article>
+          <article class="route-card"><div class="route-top"><span class="route-step">03 / DRAFT ONLY</span><span class="role">Customer Service</span></div><h4>Prepare a careful reply</h4><p>Draft an update that explains the size is unavailable now. Do not promise delivery from the vendor’s five-day lead time or send the draft.</p></article>
+        </div>
+        <div class="lower-grid">
+          <section class="info-box" aria-label="MCP tools expected for ticket 101"><div class="box-head"><h4>Likely MCP evidence</h4><span>READ FROM DB</span></div><ul class="tool-list">
+            <li><span class="tool-bullet">↗</span><span><code>get_ticket_101_tee_reprint_context()</code><br>Stock, pricing, invoice, vendor lead time, checking, shop date, payment ledger.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>get_vendor_shipping_eligibility(vendor_id=1)</code><br>Confirm the open invoice blocks new product shipment.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>get_payment_quote(kind="invoice", ref_id=501)</code><br>Use the current obligation and cash before any payment proposal.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>get_ticket_102_rent_and_cash_context()</code><br>Accounting can include the $2,400 rent due 2026-09-02 in cash planning.</span></li>
+          </ul></section>
+          <section class="info-box" aria-label="Expected ticket 101 workflow"><div class="box-head"><h4>Expected workflow</h4><span>NO ACTION YET</span></div><ol class="flow-list">
+            <li><span><strong>Verify.</strong> Keep the request tied to one `CC-TEE-WHITE`, size S; current stock is zero.</span></li>
+            <li><span><strong>Assess.</strong> The five-day lead time is a vendor fact, not a delivery promise. The open invoice currently blocks shipment.</span></li>
+            <li><span><strong>Draft and pause.</strong> Customer Service prepares internal wording. The ticket stays unresolved while payment and fulfillment remain pending.</span></li>
+          </ol><div class="approval-note"><span class="approval-icon">◆</span><span><strong>Human approval:</strong> required before paying the $840 invoice. Checking is $3,400; rent plus invoice totals $3,240, leaving $160 if both are paid. The MCP payment tool must recheck cash and invoice status at approval time.</span></div></section>
+        </div>
+        <div class="fact-strip"><span class="fact">Shop date <strong>2026-08-31</strong></span><span class="fact">Vendor <strong>Bulldog Print Co</strong></span><span class="fact">Recorded lead <strong>5 days</strong></span><span class="fact">List price <strong>$28.00</strong></span></div>
+        <div class="section-title actual-title"><h3>Actual</h3><span class="section-rule"></span><span class="pill">Problem 9</span></div>
+        <div class="actual-slot"><div><strong>Boss → Inventory · invoice paid · ticket remains open</strong><p>Boss delegated to Inventory. The first run stopped on an MCP argument mismatch for invoice 501; the retry used <code>get_ticket_101_tee_reprint_context</code>, <code>get_vendor_shipping_eligibility</code>, and <code>get_payment_quote</code>. Inventory confirmed zero size-S tees and the open-invoice shipping block. Ian approved and paid invoice 501 for $840 through the approval route. A post-payment <code>get_vendor_shipping_eligibility</code> read confirmed the vendor is now eligible to ship, but no order or shipment was placed or verified. The ticket remains open because the tee is still not in stock.</p></div><span class="reserved">Fulfillment unconfirmed</span></div>
+        <div class="source-note"><span>Evidence from the ticket-specific MCP read tool · working database only</span><code>ticket 101 / status: open</code></div>
+      </section>
+
+      <section class="tab-panel" id="panel-102" role="tabpanel" aria-labelledby="tab-102" tabindex="0" hidden>
+        <header class="ticket-head">
+          <div><p class="ticket-kicker">Resolved ticket · 102 · Rent notice</p><h2>Shop rent, due in two days</h2><p class="requester">Notice from Elm City Properties · lease 1</p></div>
+          <div class="ticket-pills"><span class="pill sage">Resolved</span><span class="pill amber">Due 2026-09-02</span><span class="pill">$2,400 rent · paid</span></div>
+        </header>
+        <div class="section-title"><h3>Expected</h3><span class="expected-label">Planned route</span><span class="section-rule"></span></div>
+        <div class="route">
+          <article class="route-card first"><div class="route-top"><span class="route-step">01 / FIRST</span><span class="role">Facilities</span></div><h4>Verify the lease notice</h4><p>Ticket 102 links to lease 1. Facilities should confirm the Chapel Street shop, landlord, rent amount, and due date against the record.</p></article>
+          <article class="route-card"><div class="route-top"><span class="route-step">02 / PAYMENT CHECK</span><span class="role">Accounting</span></div><h4>Confirm cash and obligations</h4><p>Obtain a lease payment quote. Include the already-open $840 vendor invoice when assessing the near-term checking balance.</p></article>
+          <article class="route-card"><div class="route-top"><span class="route-step">— / NOT NEEDED</span><span class="role">No further handoff</span></div><h4>Keep the route focused</h4><p>Inventory and Customer Service are not needed for a lease notice. No landlord email or vendor contact is authorized.</p></article>
+        </div>
+        <div class="lower-grid">
+          <section class="info-box" aria-label="MCP tools expected for ticket 102"><div class="box-head"><h4>Likely MCP evidence</h4><span>READ FROM DB</span></div><ul class="tool-list">
+            <li><span class="tool-bullet">↗</span><span><code>get_ticket_102_rent_and_cash_context()</code><br>Lease 1, desk date, checking balance, and payment ledger.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>get_payment_quote(kind="lease", ref_id=1)</code><br>Confirm the current amount and whether the rent can be paid without negative cash.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>get_ticket_101_tee_reprint_context()</code><br>Accounting can verify the other open $840 obligation before recommending payment timing.</span></li>
+          </ul></section>
+          <section class="info-box" aria-label="Expected ticket 102 workflow"><div class="box-head"><h4>Expected workflow</h4><span>NO ACTION YET</span></div><ol class="flow-list">
+            <li><span><strong>Anchor dates.</strong> Use `desk.date_today` (2026-08-31) and lease `next_due` (2026-09-02); the note’s “2 days” agrees.</span></li>
+            <li><span><strong>Review cash.</strong> $3,400 covers rent alone, leaving $1,000. Rent plus the $840 open invoice totals $3,240, leaving $160.</span></li>
+            <li><span><strong>Prepare, then wait.</strong> Accounting may propose rent payment; Facilities may prepare an internal draft if useful. Do not mark it paid from the notice.</span></li>
+          </ol><div class="approval-note"><span class="approval-icon">◆</span><span><strong>Human approval:</strong> required immediately before any rent payment. The approval route calls MCP, which rechecks the lease payment record and current balance; no email is sent to the landlord.</span></div></section>
+        </div>
+        <div class="fact-strip"><span class="fact">Premises <strong>Chapel Street shop</strong></span><span class="fact">Landlord <strong>Elm City Properties</strong></span><span class="fact">Monthly rent <strong>$2,400.00</strong></span><span class="fact">Desk date <strong>2026-08-31</strong></span></div>
+        <div class="section-title actual-title"><h3>Actual</h3><span class="section-rule"></span><span class="pill">Problem 9</span></div>
+        <div class="actual-slot"><div><strong>Boss → Facilities + Accounting · rent paid · ticket resolved</strong><p>Facilities verified Lease 1; Accounting checked payment feasibility using <code>get_ticket_102_rent_and_cash_context</code> and <code>get_payment_quote</code>. Ian approved the $2,400 rent payment through the explicit approval route. After ticket 101’s $840 payment, checking was $2,560; rent left $160. Payment is recorded for shop date 2026-08-31. MCP verified the full approved payment in the ledger and resolved ticket 102. The landlord was not contacted.</p></div><span class="reserved">Resolved</span></div>
+        <div class="source-note"><span>Evidence from ticket, payment and guarded resolution MCP tools · working database only</span><code>ticket 102 / status: resolved</code></div>
+      </section>
+
+      <section class="tab-panel" id="panel-103" role="tabpanel" aria-labelledby="tab-103" tabindex="0" hidden>
+        <header class="ticket-head">
+          <div><p class="ticket-kicker">Open ticket · 103 · Price override</p><h2>Twenty hoodies, size M</h2><p class="requester">Bulk discount request from Yale AI Club</p></div>
+          <div class="ticket-pills"><span class="pill sage">Open</span><span class="pill rose">8 of 20 in M</span><span class="pill">No override on file</span></div>
+        </header>
+        <div class="section-title"><h3>Expected</h3><span class="expected-label">Planned route</span><span class="section-rule"></span></div>
+        <div class="route">
+          <article class="route-card first"><div class="route-top"><span class="route-step">01 / FIRST</span><span class="role">Inventory</span></div><h4>Establish stock and price facts</h4><p>The requested size has 8 units against a request for 20. Inventory should check all sizes, recorded cost/list price, and whether the vendor table names a suitable source.</p></article>
+          <article class="route-card"><div class="route-top"><span class="route-step">02 / DRAFT</span><span class="role">Customer Service</span></div><h4>Prepare a noncommittal reply</h4><p>Explain the size-M shortage and known price facts, then ask whether the club wants to discuss the available quantity. Keep it as an internal draft.</p></article>
+          <article class="route-card"><div class="route-top"><span class="route-step">— / NOT NEEDED</span><span class="role">No further handoff</span></div><h4>No payment decision yet</h4><p>There is no vendor or invoice linked to this ticket. Accounting is unnecessary unless a real outgoing purchase proposal is later considered.</p></article>
+        </div>
+        <div class="lower-grid">
+          <section class="info-box" aria-label="MCP tools expected for ticket 103"><div class="box-head"><h4>Likely MCP evidence</h4><span>READ FROM DB</span></div><ul class="tool-list">
+            <li><span class="tool-bullet">↗</span><span><code>get_ticket_103_hoodie_stock_and_pricing()</code><br>All hoodie sizes, quantities, unit cost, and list price.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>list_vendors()</code><br>Use only recorded vendor specialties and lead times; current data does not identify a hoodie-specific supplier.</span></li>
+            <li><span class="tool-bullet">↗</span><span><code>get_vendor_shipping_eligibility(vendor_id=1)</code><br>Only if Bulldog Print Co is later considered; its open invoice blocks new shipment.</span></li>
+          </ul></section>
+          <section class="info-box" aria-label="Expected ticket 103 workflow"><div class="box-head"><h4>Expected workflow</h4><span>NO ACTION YET</span></div><ol class="flow-list">
+            <li><span><strong>Quantify.</strong> Eight M hoodies are in stock, twelve short of the request. Other sizes do not satisfy the requested size unless the customer agrees.</span></li>
+            <li><span><strong>Ground pricing.</strong> Unit cost is $22 and list price is $58. No bulk override is stored; the database does not specify an approved discount.</span></li>
+            <li><span><strong>Draft, don’t commit.</strong> Customer Service can ask how the club wants to proceed. Do not accept the full order, promise sourcing, or invent a vendor/date.</span></li>
+          </ol><div class="approval-note"><span class="approval-icon">◆</span><span><strong>Human approval:</strong> no payment is implicated by the current ticket. If a later plan requires an outgoing purchase, obtain operator approval before money moves and recheck vendor eligibility through MCP.</span></div></section>
+        </div>
+        <div class="fact-strip"><span class="fact">Requested <strong>20 × M</strong></span><span class="fact">Available <strong>8 × M</strong></span><span class="fact">Unit cost <strong>$22.00</strong></span><span class="fact">List price <strong>$58.00</strong></span></div>
+        <div class="section-title actual-title"><h3>Actual</h3><span class="section-rule"></span><span class="pill">Problem 9</span></div>
+        <div class="actual-slot"><div><strong>Boss → Inventory + Customer Service · draft only · ticket remains open</strong><p>The team used <code>get_ticket_103_hoodie_stock_and_pricing</code>: 8 size-M hoodies are recorded against 20 requested; no bulk price is approved. Inventory advised against promising the full quantity; Customer Service prepared an internal reply. The same context tool was redundantly read by all three agents, and Customer Service's attempted delegation back to Boss was stopped as a cycle. No vendor tool was used, no message was sent, and no order was accepted.</p></div><span class="reserved">Draft only</span></div>
+        <div class="source-note"><span>Evidence from ticket-specific MCP reads · working database only</span><code>ticket 103 / status: open</code></div>
+      </section>
+
+      <section class="tab-panel" id="panel-cash" role="tabpanel" aria-labelledby="tab-cash" tabindex="0" hidden>
+        <div class="reflection-page"><div class="section-title"><h3>Checking reconciliation</h3><span class="expected-label">Verified against working DB</span><span class="section-rule"></span></div><div class="reflection-two"><article class="reflection-box"><h4>Starting balance after clean reset</h4><p><strong>$3,400.00</strong> · checking, recorded 2026-08-31.</p><h4>Ticket cash movements</h4><p>Ticket 101 · <strong>−$840.00</strong> for invoice 501 (Bulldog Print Co reprint obligation). Ian approved it; checking became $2,560.00.</p><p>Ticket 102 · <strong>−$2,400.00</strong> for Lease 1 rent. Ian approved it after the invoice payment; checking became $160.00.</p><p>Ticket 103 · <strong>$0.00</strong>. No purchase or payment was proposed.</p></article><article class="reflection-box"><h4>Ending balance and arithmetic</h4><div class="reflection-ledger"><span class="fact">Start<strong>$3,400.00</strong></span><span class="fact">101<strong>−$840.00</strong></span><span class="fact">102<strong>−$2,400.00</strong></span><span class="fact">103<strong>$0.00</strong></span><span class="fact">End<strong>$160.00</strong></span></div><p style="margin-top:10px">$3,400.00 − $840.00 − $2,400.00 − $0.00 = <strong>$160.00</strong>. Verified against <code>cash_accounts</code> and the two rows in <code>payments</code>; no incoming revenue was recorded. Both approver fields say Ian.</p></article></div></div>
+      </section>
+
+      <section class="tab-panel" id="panel-reflection" role="tabpanel" aria-labelledby="tab-reflection" tabindex="0" hidden>
+        <div class="reflection-page">
+          <header class="reflection-intro">
+            <p class="eyebrow">Problem 10 / Run review</p>
+            <h2>What I learned from these three runs.</h2>
+            <p>I expected three neatly routed tickets. The actual runs were more useful as a test of the boundaries: the agents found the facts and drafted decisions, but approvals and fulfillment still needed a person or a tool the system does not have.</p>
+          </header>
+
+          <div class="reflection-status"><span class="pill amber">2 tickets still open</span><span>At the final DB check, ticket 102 was <code>resolved</code> after MCP verified its fully paid lease obligation. Tickets 101 and 103 remain <code>open</code>: ticket 101 has no shipment/receipt record, and ticket 103 still needs a pricing/order disposition. Checking is <strong>$160.00</strong> with two approved outgoing payments in the ledger. The append-only audit includes the initial ticket 101 argument error, retry, approvals, payments, vendor eligibility check, and ticket 102 resolution.</span></div>
+
+          <div class="section-title reflection-section"><h3>Ticket by ticket</h3><span class="expected-label">Expected vs. actual</span><span class="section-rule"></span></div>
+          <div class="reflection-stack">
+            <article class="reflection-card">
+              <header class="reflection-card-head"><span class="reflection-id">101</span><div><h4>Bulldog tee, size S</h4><p>Expected: Inventory, then Accounting and Customer Service if justified.</p></div><span class="pill amber">Invoice paid · open</span></header>
+              <div class="reflection-points">
+                <section><h5>What worked</h5><p>The successful retry used <code>get_ticket_101_tee_reprint_context</code>, <code>get_vendor_shipping_eligibility</code>, and <code>get_payment_quote</code>. Inventory confirmed 0 size-S tees and the initial constraint: invoice 501 for $840 was open, so Bulldog Print Co could not ship. After Ian paid it, the follow-up eligibility tool returned no open invoices. The $28 list price and five-day vendor lead time remain database facts, not a delivery promise. Boss produced a cautious customer draft.</p></section>
+                <section><h5>What missed the plan</h5><p>Only Inventory was delegated. Boss handled the payment quote and draft itself, so Accounting and Customer Service did not participate; the planned rent-context read was also skipped. Inventory repeated the ticket and eligibility reads Boss had already made. That duplication cost calls without changing the answer.</p></section>
+                <section><h5>My assessment</h5><p>The first real attempt failed when the model passed <code>invoice_id=501</code> to a tool expecting <code>kind/ref_id</code>. That failure remains in the append-only audit. After the adapter fix, the run created an $840 approval proposal; Ian later approved it through the explicit route. The database records invoice 501 paid and a follow-up MCP eligibility read found no open vendor invoices. This still did not create an order or prove a shipment, so the tee ticket correctly remains open.</p></section>
+              </div>
+              <div class="reflection-takeaway"><strong>Delegation:</strong><span>Inventory added real value on the reprint block. A second specialist might have helped compare rent before recommending payment, but the actual Boss reached a reasonable recommendation without that handoff. The repeated reads were the inefficient part.</span></div>
+            </article>
+
+            <article class="reflection-card">
+              <header class="reflection-card-head"><span class="reflection-id">102</span><div><h4>Shop rent, due September 2</h4><p>Expected: Facilities first, then Accounting for the payment check.</p></div><span class="pill sage">Resolved · paid</span></header>
+              <div class="reflection-points">
+                <section><h5>What worked</h5><p>Boss delegated to both Facilities and Accounting, just as the plan anticipated. Facilities verified lease 1: $2,400 for the Chapel Street shop, due 2026-09-02; that agrees with <code>desk.date_today</code> of 2026-08-31 and the ticket’s “two days” note. The initial <code>get_payment_quote</code> showed rent alone leaves $1,000 from $3,400; after ticket 101’s invoice payment, the approval route rechecked cash and the actual rent payment left $160.</p></section>
+                <section><h5>What was inefficient</h5><p>Boss, Facilities, and Accounting all read <code>get_ticket_102_rent_and_cash_context</code>. The two specialist views were useful, but both fetched the same lease, date, and cash facts. A shared evidence packet could avoid those duplicate MCP calls while keeping the two distinct checks.</p></section>
+                <section><h5>My assessment</h5><p>Actual routing matched Expected better than the other runs. Accounting proposed the $2,400 payment, then Ian approved it after ticket 101’s $840 invoice payment. The rent payment route rechecked the new balance and left $160. The original approval handler did not close the ticket, so I added a narrow MCP resolution guard that only resolves the rent notice after verifying its matching full payment and recorded approver. Ticket 102 now shows resolved; no landlord contact was made.</p></section>
+              </div>
+              <div class="reflection-takeaway"><strong>Delegation:</strong><span>Facilities and Accounting each had a real job here—confirm the lease notice versus assess outgoing cash. The handoffs were justified; repeating the same context read was not.</span></div>
+            </article>
+
+            <article class="reflection-card">
+              <header class="reflection-card-head"><span class="reflection-id">103</span><div><h4>Twenty hoodies, size M</h4><p>Expected: Inventory first, Customer Service for an internal draft.</p></div><span class="pill rose">Draft only</span></header>
+              <div class="reflection-points">
+                <section><h5>What worked</h5><p>Inventory and Customer Service both participated. <code>get_ticket_103_hoodie_stock_and_pricing</code> confirmed 8 of 20 size-M “Basic Hoodie Big Yale” hoodies, a shortfall of 12, with $22 unit cost and $58 list price. Customer Service drafted a reply without sending it or accepting the order.</p></section>
+                <section><h5>What was unnecessary</h5><p>Boss, Inventory, and Customer Service each called the same ticket-specific tool. The Expected plan also listed <code>list_vendors</code>, but no vendor is linked to this hoodie and the run did not call it. More notably, Customer Service tried to delegate back to Boss; the runtime correctly stopped that cycle, but the attempted handoff added no value.</p></section>
+                <section><h5>My assessment</h5><p>The outcome was <code>draft_only</code>, not a resolution. No bulk discount was approved, no units were reserved, and no order was accepted. Boss recommended keeping the ticket pending. That is more honest than inventing a price or a hoodie supplier, but it leaves the request open for a customer/policy decision.</p></section>
+              </div>
+              <div class="reflection-takeaway"><strong>Delegation:</strong><span>The Inventory check and customer-safe draft were a sensible split. The circular attempt to return the pricing question to Boss shows why clear “do not delegate back for authority you do not have” instructions matter.</span></div>
+            </article>
+          </div>
+
+          <div class="section-title reflection-section"><h3>What I would simplify</h3><span class="section-rule"></span></div>
+          <div class="reflection-two">
+            <article class="reflection-box"><h4>Where one capable tool-using agent is enough</h4><p>These are small, narrow records. For ticket 102, one agent could read the lease/date/cash, quote the $2,400 payment, and stop for approval; Facilities and Accounting mostly re-read one shared context. For ticket 103, one agent could read the 8-versus-20 stock and $22/$58 price, then write the internal draft. Ticket 101 could also be one agent for the stock, invoice, vendor block, quote, and draft—the Inventory specialist did add useful scrutiny, but the duplicated reads outweighed the extra perspective.</p><p>I would keep the five-role setup for genuinely different evidence or a second opinion on a consequential decision. I would not make a specialist delegation mandatory just because the role exists.</p></article>
+            <article class="reflection-box"><h4>Two payments changed the cash position</h4><p>Ian explicitly approved both pending requests through the dashboard’s backend approval route. Invoice 501 reduced checking by $840; Lease 1 rent reduced it by $2,400. No incoming revenue was recorded. Ticket 103 had no cash effect.</p><div class="reflection-ledger"><span class="fact">Starting<strong>$3,400.00</strong></span><span class="fact">Ticket 101<strong>−$840.00</strong></span><span class="fact">Ticket 102<strong>−$2,400.00</strong></span><span class="fact">Ending<strong>$160.00</strong></span></div><p style="margin-top:10px">Auditable check: $3,400.00 − $840.00 − $2,400.00 = $160.00. The value matches <code>cash_accounts.checking.balance</code> and the two approved rows in <code>payments</code>.</p></article>
+          </div>
+
+          <div class="section-title reflection-section"><h3>What this team can and cannot do today</h3><span class="section-rule"></span></div>
+          <div class="reflection-two">
+            <article class="reflection-box"><h4>Three realistic problems it can handle</h4><ol class="reflection-list">
+              <li><span><strong>Check and pay recorded obligations with operator approval.</strong> The ticket 101/102 context and <code>get_payment_quote</code> showed $840 + $2,400 = $3,240, leaving $160 from $3,400. Ian explicitly approved both; the API/MCP route executed each and rechecked cash. The system still cannot reserve future expenses.</span></li>
+              <li><span><strong>Check a vendor’s recorded lead time and shipment block.</strong> <code>list_vendors</code> and <code>get_vendor_shipping_eligibility</code> report Bulldog Print Co’s five-day lead and open-invoice rule. After invoice 501 was paid, a real follow-up read showed no open invoices and shipping eligibility; the system still cannot contact the vendor or confirm delivery.</span></li>
+              <li><span><strong>Prepare a grounded partial-availability response.</strong> The ticket 103 stock/pricing tool can support a draft that says 8 M hoodies are recorded at a $58 list price, with no approved discount. Customer Service can keep that text internal and avoid accepting the 20-unit request.</span></li>
+            </ol></article>
+            <article class="reflection-box"><h4>Three problems it cannot complete with today’s tools</h4><ol class="reflection-list">
+              <li><span><strong>Source and buy the 12 missing hoodies.</strong> There is no hoodie-specific vendor match (vendors list apparel reprints, mugs/small goods, and courier service), purchase-order table, or PO/payment quote. I’d need a vendor–SKU catalog, purchasing records, a procurement capability, and an MCP order/approval flow that rechecks cash and vendor eligibility.</span></li>
+              <li><span><strong>Reserve, ship, or receive the tee/hoodie units.</strong> The current inventory tool is read-only and there is no order-fulfillment, reservation, shipment, or receiving record. I’d need those tables and guarded MCP writes, plus a human/vendor-confirmed shipment status; a five-day lead field alone is not proof of fulfillment.</span></li>
+              <li><span><strong>Choose and authorize a bulk discount.</strong> The pricing table has only unit cost and list price ($22/$58 for the hoodie), not discount tiers or approval policy. I’d need a documented pricing policy, an authorized override workflow/tool, and a pricing approver capability. Until then, the agent must not invent a discount.</span></li>
+            </ol></article>
+          </div>
+        </div>
+      </section>
+    </section>
+    <footer class="footer"><span>Campus Customs · Operations planning</span><span class="mono">EXPECTED PLANS / REAL RUNS RECORDED</span></footer>
+  </main>
+  <script>
+    (() => {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
+      function activate(index, focus = false) {
+        tabs.forEach((tab, i) => {
+          const selected = i === index;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+          panels[i].hidden = !selected;
+        });
+        if (focus) tabs[index].focus();
+      }
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activate(index));
+        tab.addEventListener('keydown', event => {
+          let next = index;
+          if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+          else if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+          else if (event.key === 'Home') next = 0;
+          else if (event.key === 'End') next = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          activate(next, true);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

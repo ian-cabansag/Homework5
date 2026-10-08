@@ -1,0 +1,61 @@
+{
+  "record_type": "actual_ticket_run_snapshot",
+  "completion_status": "partially_resolved",
+  "financial_actions_status": "two_approved_payments_recorded",
+  "as_of": "2026-10-08",
+  "note": "This file records actual outcomes and database status. Ticket 102 was resolved after MCP verified its human-approved lease payment. Tickets 101 and 103 remain open because fulfillment and pricing/order disposition are outstanding.",
+  "cash_reconciliation": {
+    "starting_checking_balance": 3400.0,
+    "ticket_101_change": -840.0,
+    "ticket_102_change": -2400.0,
+    "ticket_103_change": 0.0,
+    "ending_checking_balance": 160.0,
+    "arithmetic": "3400.00 - 840.00 - 2400.00 - 0.00 = 160.00"
+  },
+  "tickets": [
+    {
+      "id": 101,
+      "ticket_id": 101,
+      "final_status": "open",
+      "run_status": "needs_approval",
+      "outcome": "Size-S tee stock is zero. Ian approved and paid invoice 501 for $840, clearing Bulldog Print Co's open-invoice shipping block. A follow-up MCP check found the vendor eligible to ship, but no order or shipment was placed or verified, so the ticket remains open.",
+      "agent_contributions": [
+        {"agent": "Boss", "contribution": "Triaged the stockout, routed Inventory, and prepared the evidence-backed invoice approval proposal."},
+        {"agent": "Inventory", "contribution": "Verified zero size-S stock and that the vendor cannot ship while invoice 501 is open."}
+      ],
+      "human_approvals": [
+        {"approval_id": "14690394-393d-4ffc-af21-41c3505fe22d", "decision": "approved", "approved_by": "Ian", "kind": "invoice", "reference_id": 501, "amount": 840.0, "payment_id": 1, "cash_changed": true, "balance_after_payment": 2560.0}
+      ],
+      "audit_note": "The initial run stopped on an MCP argument mismatch; the retry completed with an approval proposal. Ian's approval and payment execution, followed by the vendor eligibility check, are recorded in the append-only audit trail."
+    },
+    {
+      "id": 102,
+      "ticket_id": 102,
+      "final_status": "resolved",
+      "run_status": "needs_approval",
+      "outcome": "Ian approved and paid Lease 1 rent of $2,400, due 2026-09-02. MCP verified the full approved payment and resolved ticket 102. Checking ended at $160.00; no landlord contact occurred.",
+      "agent_contributions": [
+        {"agent": "Boss", "contribution": "Coordinated lease verification and cash/payment assessment."},
+        {"agent": "Facilities", "contribution": "Verified the Chapel Street lease, landlord, rent amount, due date, and consistency with the desk date."},
+        {"agent": "Accounting", "contribution": "Quoted payment feasibility and prepared a human approval request without moving cash."}
+      ],
+      "human_approvals": [
+        {"approval_id": "e997b31a-988a-4f31-b1c6-b2be81fb28af", "decision": "approved", "approved_by": "Ian", "kind": "lease", "reference_id": 1, "amount": 2400.0, "payment_id": 2, "cash_changed": true, "balance_after_payment": 160.0}
+      ],
+      "resolution": {"status": "resolved", "basis": "MCP verified the matching full lease payment and recorded approver before closing the rent notice.", "external_contact_made": false}
+    },
+    {
+      "id": 103,
+      "ticket_id": 103,
+      "final_status": "open",
+      "run_status": "draft_only",
+      "outcome": "Eight size-M hoodies are recorded against a request for twenty. No discount is approved; an internal customer reply was drafted but not sent. The request remains open for a human decision.",
+      "agent_contributions": [
+        {"agent": "Boss", "contribution": "Synthesized the stock and pricing evidence and recommended not accepting the full order or inventing a discount."},
+        {"agent": "Inventory", "contribution": "Verified the 12-unit size-M shortfall and advised against promising unconfirmed replenishment."},
+        {"agent": "Customer Service", "contribution": "Prepared an internal, noncommittal customer response; did not send it."}
+      ],
+      "human_approvals": []
+    }
+  ]
+}

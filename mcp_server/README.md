@@ -1,0 +1,36 @@
+# Campus Customs MCP server
+
+This FastMCP server gives the operations agents focused, database-backed evidence for the three Campus Customs tickets. All business reads and writes stay in the MCP layer. AI agents receive read tools only; the payment tool is called by the backend only after explicit human approval. A rent notice can be resolved only after MCP verifies its full approved payment in the ledger.
+
+## Database
+
+The server reads and, for a specifically approved payment, updates `data/campus_customs_new.db` relative to this file. Read tools open SQLite in read-only mode and enable `query_only`. The payment tool uses a transaction and never connects to the original `data/campus_customs.db`.
+
+## Install and run
+
+From the HW5 project root, install the MCP Python SDK in the Python environment the client will use, then launch the stdio server:
+
+```powershell
+py -m pip install -r mcp_server/requirements.txt
+py -m mcp_server.server
+```
+
+The server expects the working database to exist before launch. The project Codex configuration uses the workspace's existing parent `.venv` with a project-relative path because that environment has the FastMCP-compatible MCP SDK 1.x. For another environment, point the MCP client at `python -m mcp_server.server` with the HW5 project root as its working directory; FastMCP communicates over standard input/output.
+
+## Tools
+
+| Tool | Tables used | Purpose and access |
+|---|---|---|
+| `get_ticket_101_tee_reprint_context` | `tickets`, `inventory`, `pricing`, `invoices`, `vendors`, `cash_accounts`, `desk`, `payments` | Reads ticket 101's tee stock, pricing, linked reprint and vendor lead time, date, cash, and payment ledger. |
+| `get_ticket_102_rent_and_cash_context` | `tickets`, `leases`, `cash_accounts`, `desk`, `payments` | Reads ticket 102's lease, rent due date, desk date, checking balance, and payment ledger. |
+| `get_ticket_103_hoodie_stock_and_pricing` | `tickets`, `inventory`, `pricing` | Reads ticket 103's requested hoodie quantity, all size stock, unit cost, and list price. |
+| `list_vendors` | `vendors` | Reads database vendor specialties and lead times without inferring unsupported product matches. |
+| `get_vendor_shipping_eligibility` | `vendors`, `invoices` | Reads a vendor's open invoices and reports whether new product is blocked from shipping. |
+| `get_payment_quote` | `cash_accounts`, `desk`, `invoices` or `leases`, `payments` | Reads the authoritative amount, shop date, cash, and duplicate/open status for an outgoing payment proposal. |
+| `get_dashboard_tickets` | `tickets` | Returns tickets 101–103 and their actual current statuses for FastAPI/the dashboard. |
+| `get_checking_balance` | `cash_accounts` | Returns the current checking balance and recorded date for FastAPI/the dashboard. |
+| `execute_approved_payment` | `cash_accounts`, `desk`, `invoices` or `leases`, `payments`, `tickets` | Writes one outgoing invoice or rent payment only when called with the backend's one-time approval token; atomically checks current cash, records approver/payment/date, reduces checking, marks an invoice paid, and resolves a linked rent notice after payment. |
+| `resolve_paid_rent_notice` | `tickets`, `leases`, `payments` | Reconciles ticket 102 after an already-recorded full lease payment; refuses if the ticket is not the linked rent notice or the payment is missing, partial, or lacks an approver. Never moves cash. |
+| `reset_working_database` | Original/working database files; SQLite integrity metadata | Replaces only the working DB with a verified copy of the original; never writes the source DB. |
+
+Tools take no caller-supplied SQL. Required identifiers and payment kinds are validated; missing required records raise an error instead of being filled in with assumptions. The backend exposes only read tools to PydanticAI. It invokes `execute_approved_payment` only after an operator approves a pending request, and the short-lived approval token is not written to the audit log. The write tool rechecks that the obligation remains open/unpaid and that checking will not go below zero inside a SQLite transaction. Rent resolution is guarded by a full human-approved lease payment record. No tool records incoming revenue, sends email, or contacts a vendor.
