@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+from contextlib import AsyncExitStack
 from typing import Any
 
 from mcp import ClientSession, StdioServerParameters
@@ -13,6 +14,8 @@ from backend.models import Ticket
 
 
 AGENT_READ_TOOLS = {
+    "get_ticket_resolution_quote",
+    "get_ticket_resolution_record",
     "get_ticket_101_tee_reprint_context",
     "get_ticket_102_rent_and_cash_context",
     "get_ticket_103_hoodie_stock_and_pricing",
@@ -20,7 +23,7 @@ AGENT_READ_TOOLS = {
     "get_vendor_shipping_eligibility",
     "get_payment_quote",
 }
-APPROVAL_ONLY_TOOLS = {"execute_approved_payment"}
+APPROVAL_ONLY_TOOLS = {"execute_approved_payment", "execute_approved_ticket_resolution"}
 API_READ_TOOLS = {"get_dashboard_tickets", "get_checking_balance"}
 ADMIN_TOOLS = {"reset_working_database"}
 RESOLUTION_TOOLS = {"resolve_paid_rent_notice"}
@@ -32,6 +35,7 @@ class MCPGateway:
         self._session_context: Any = None
         self.session: ClientSession | None = None
         self._approval_token = approval_token
+        self._exit_stack = AsyncExitStack()
 
     async def __aenter__(self) -> "MCPGateway":
         child_env = os.environ.copy()
@@ -44,18 +48,17 @@ class MCPGateway:
             args=[str(MCP_SERVER_PATH)],
             env=child_env,
         )
-        self._stdio_context = stdio_client(parameters)
-        read_stream, write_stream = await self._stdio_context.__aenter__()
-        self._session_context = ClientSession(read_stream, write_stream)
-        self.session = await self._session_context.__aenter__()
-        await self.session.initialize()
+        try:
+            read_stream, write_stream = await self._exit_stack.enter_async_context(stdio_client(parameters))
+            self.session = await self._exit_stack.enter_async_context(ClientSession(read_stream, write_stream))
+            await self.session.initialize()
+        except BaseException:
+            await self._exit_stack.aclose()
+            raise
         return self
 
     async def __aexit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
-        if self._session_context is not None:
-            await self._session_context.__aexit__(exc_type, exc, traceback)
-        if self._stdio_context is not None:
-            await self._stdio_context.__aexit__(exc_type, exc, traceback)
+        await self._exit_stack.__aexit__(exc_type, exc, traceback)
 
     async def list_tool_names(self) -> set[str]:
         if self.session is None:
@@ -79,6 +82,10 @@ class MCPGateway:
         }:
             return {}
         if name == "get_payment_quote":
+            if "payment_kind" in arguments and "reference_id" in arguments:
+                if ("kind" in arguments and arguments["kind"] != arguments["payment_kind"]) or ("ref_id" in arguments and arguments["ref_id"] != arguments["reference_id"]):
+                    raise ValueError("Conflicting payment identifiers.")
+                arguments = {**arguments, "kind": arguments["payment_kind"], "ref_id": arguments["reference_id"]}
             if "invoice_id" in arguments and "lease_id" in arguments:
                 raise ValueError("Payment quote arguments cannot identify both an invoice and a lease.")
             if "kind" in arguments and "ref_id" in arguments:
@@ -105,6 +112,11 @@ class MCPGateway:
         if name not in API_READ_TOOLS:
             raise PermissionError("This MCP operation is not an API dashboard read.")
         return await self._call(name, {})
+
+    async def execute_human_approved_resolution(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        if not self._approval_token:
+            raise PermissionError("No human approval token was provided.")
+        return await self._call("execute_approved_ticket_resolution", {**arguments, "approval_token": self._approval_token})
 
     async def reset_working_database(self) -> dict[str, Any]:
         if "reset_working_database" not in ADMIN_TOOLS:

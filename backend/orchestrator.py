@@ -8,6 +8,7 @@ from backend.agents import (
     MAX_AGENT_RUNS,
     MAX_DELEGATIONS,
     MAX_DELEGATION_DEPTH,
+    MAX_MCP_CALLS,
     AgentBudget,
     AgentDeps,
     build_agents,
@@ -102,6 +103,7 @@ async def run_ticket(
                 "recommendations": report.recommendations,
                 "drafts": report.drafts,
                 "approval_requests": [item.model_dump(mode="json") for item in report.approval_requests],
+                "resolution_requests": [item.model_dump(mode="json") for item in report.resolution_requests],
             }
             specialist_reports.append(record)
             await audit.append(AgentEvent(
@@ -199,8 +201,7 @@ async def run_ticket(
         )
         approval_ids: list[str] = []
         for request in reply.approval_requests:
-            budget.mcp_calls += 1
-            if budget.mcp_calls > MAX_AGENT_RUNS + MAX_DELEGATIONS + 4:
+            if budget.mcp_calls >= MAX_MCP_CALLS:
                 await audit.append(AgentEvent(
                     run_id=run_id,
                     ticket_id=ticket_id,
@@ -209,13 +210,14 @@ async def run_ticket(
                     summary="Approval proposal stopped at the MCP call limit.",
                 ))
                 break
+            budget.mcp_calls += 1
             quote = await mcp.call_agent_tool(
                 "get_payment_quote",
                 {"kind": request.payment_kind, "ref_id": request.reference_id},
             )
             if (
                 not quote.get("can_pay_if_human_approved")
-                or abs(float(quote.get("amount", -1)) - request.amount) > 0.01
+                or float(quote.get("amount", -1)) != request.amount
             ):
                 await audit.append(AgentEvent(
                     run_id=run_id,
@@ -244,6 +246,27 @@ async def run_ticket(
                 },
             ))
 
+        for request in reply.resolution_requests:
+            if request.ticket_id != ticket_id:
+                raise ValueError("Resolution proposal must belong to the active ticket.")
+            if budget.mcp_calls >= MAX_MCP_CALLS:
+                raise RuntimeError("Resolution quote exceeds the MCP call budget.")
+            budget.mcp_calls += 1
+            quote = await mcp.call_agent_tool("get_ticket_resolution_quote", {"ticket_id": ticket_id})
+            eligible = quote.get("can_finalize_if_human_approved") is True
+            approval_id = str(uuid4()) if eligible else None
+            if approval_id:
+                approval_ids.append(approval_id)
+            await audit.append(AgentEvent(
+                run_id=run_id, ticket_id=ticket_id, agent=AgentRole.BOSS,
+                event_type="approval_requested" if eligible else "approval_proposal_blocked",
+                tool_name="get_ticket_resolution_quote", approval_id=approval_id,
+                summary="Internal disposition requires human approval; no fulfillment or cash change." if eligible else str(quote["blocked_reason"]),
+                details={"request": {"payment_kind": "ticket_resolution", "reference_id": ticket_id,
+                                     "amount": 0, "rationale": request.rationale},
+                         "authoritative_quote": quote},
+            ))
+
         outcome = TicketOutcome(
             run_id=run_id,
             ticket_id=ticket_id,
@@ -269,7 +292,8 @@ async def run_ticket(
             agent=AgentRole.BOSS,
             event_type="ticket_run_stopped",
             summary=outcome.stop_reason,
-            details={"status": outcome.status, "pending_approval_ids": approval_ids},
+            details={"status": outcome.status, "pending_approval_ids": approval_ids,
+                     "outcome": outcome.model_dump(mode="json")},
         ))
         return outcome
     except Exception as error:

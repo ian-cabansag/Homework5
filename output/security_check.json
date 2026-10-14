@@ -1,0 +1,9 @@
+{
+  "working_files_scanned": 73,
+  "git_blobs_scanned": 44,
+  "known_key_comparison_available": true,
+  "findings": [],
+  "real_env_tracked": false,
+  "both_databases_tracked": true,
+  "scope": "Project source/evidence and reachable Git history; excludes local secrets and generated dependencies/caches."
+}

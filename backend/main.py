@@ -116,8 +116,9 @@ async def run_one_ticket(
 async def recent_events(
     limit: Annotated[int, Query(ge=1, le=500)] = 100,
     ticket_id: Annotated[int | None, Query(ge=101, le=103)] = None,
+    include_history: bool = False,
 ) -> AgentEventsResponse:
-    events = audit.events()
+    events = audit.events() if include_history else audit.current_events()
     if ticket_id is not None:
         events = [event for event in events if event.get("ticket_id") == ticket_id]
     recent = events[-limit:]
@@ -147,6 +148,13 @@ async def decide_payment(
     decision: ApprovalDecision,
 ) -> dict[str, object]:
     """Record a human decision; only an explicit approval invokes the MCP payment tool."""
+    async with operation_lock:
+        return await _decide_payment_locked(approval_id, decision)
+
+
+async def _decide_payment_locked(
+    approval_id: str, decision: ApprovalDecision,
+) -> dict[str, object]:
     pending = audit.pending_approval(approval_id)
     if pending is None:
         raise HTTPException(status_code=404, detail="Pending approval was not found.")
@@ -161,13 +169,36 @@ async def decide_payment(
         agent="Human",
         event_type="approval_decision",
         approval_id=approval_id,
-        summary="Operator approved the proposed payment." if decision.decision == "approve" else "Operator rejected the proposed payment.",
+        summary="Operator approved the proposed action." if decision.decision == "approve" else "Operator rejected the proposed action.",
         details={"decision": decision.decision, "approved_by": operator, "note": decision.note},
     ))
     if decision.decision == "reject":
         return {"approval_id": approval_id, "decision": "rejected", "cash_changed": False}
 
     request = pending.get("details", {}).get("request", {})
+    if request.get("payment_kind") == "ticket_resolution":
+        try:
+            async with MCPGateway(approval_token=secrets.token_urlsafe(48)) as gateway:
+                result = await gateway.execute_human_approved_resolution({
+                    "ticket_id": request["reference_id"], "approved_by": operator,
+                    "approval_id": approval_id,
+                    "quote_fingerprint": pending["details"]["authoritative_quote"]["fingerprint"],
+                })
+        except Exception as error:
+            await audit.append(AgentEvent(
+                run_id=pending["run_id"], ticket_id=pending.get("ticket_id"),
+                event_type="resolution_blocked", approval_id=approval_id,
+                tool_name="execute_approved_ticket_resolution",
+                summary=f"Internal resolution blocked ({type(error).__name__}); review current evidence again.",
+            ))
+            raise HTTPException(status_code=409, detail="Resolution blocked by current database safeguards.") from error
+        await audit.append(AgentEvent(
+            run_id=pending["run_id"], ticket_id=pending.get("ticket_id"),
+            event_type="ticket_resolved", approval_id=approval_id,
+            tool_name="execute_approved_ticket_resolution", summary=result["summary"],
+            details={"resolution": result, "status": "resolved"},
+        ))
+        return {"approval_id": approval_id, "decision": "approved", "cash_changed": False, "resolution": result}
     try:
         approval_token = secrets.token_urlsafe(48)
         async with MCPGateway(approval_token=approval_token) as gateway:
@@ -176,6 +207,7 @@ async def decide_payment(
                 "ref_id": request["reference_id"],
                 "approved_by": operator,
                 "approval_id": approval_id,
+                "approved_amount": request["amount"],
             })
     except Exception as error:
         await audit.append(AgentEvent(
@@ -222,13 +254,13 @@ async def reset_working_database(request: ResetRequest) -> ResetResponse:
         async with operation_lock:
             async with MCPGateway() as gateway:
                 result = await gateway.reset_working_database()
-        await audit.append(AgentEvent(
-            run_id=str(uuid4()),
-            agent="System",
-            event_type="working_database_reset",
-            summary="Operator explicitly reset the working database from the original source.",
-            details={"database": result.get("database"), "integrity_check": result.get("integrity_check")},
-        ))
+            await audit.append(AgentEvent(
+                run_id=str(uuid4()),
+                agent="System",
+                event_type="working_database_reset",
+                summary="Operator explicitly reset the working database; earlier approvals are invalidated.",
+                details={"database": result.get("database"), "integrity_check": result.get("integrity_check")},
+            ))
         return ResetResponse.model_validate(result)
     except Exception as error:
         raise HTTPException(status_code=502, detail="Working database reset failed through MCP.") from error

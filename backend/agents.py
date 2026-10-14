@@ -16,6 +16,8 @@ from backend.settings import MODEL_NAME, PORTKEY_BASE_URL, PROMPTS_DIR, require_
 
 
 MCPToolName = Literal[
+    "get_ticket_resolution_quote",
+    "get_ticket_resolution_record",
     "get_ticket_101_tee_reprint_context",
     "get_ticket_102_rent_and_cash_context",
     "get_ticket_103_hoodie_stock_and_pricing",
@@ -56,6 +58,9 @@ ROLE_TOOLS = {
         "list_vendors",
     }),
 }
+
+for _role in ROLE_TOOLS:
+    ROLE_TOOLS[_role] = ROLE_TOOLS[_role] | {"get_ticket_resolution_quote", "get_ticket_resolution_record"}
 
 DelegateHandler = Callable[[DelegationRequest], Awaitable[dict[str, Any]]]
 

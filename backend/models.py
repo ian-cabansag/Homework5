@@ -49,7 +49,7 @@ class ToolResult(BaseModel):
 class ApprovalRequest(BaseModel):
     payment_kind: Literal["invoice", "lease"]
     reference_id: int = Field(gt=0)
-    amount: float = Field(gt=0)
+    amount: float = Field(gt=0, allow_inf_nan=False)
     rationale: str = Field(min_length=8, max_length=1000)
     evidence_refs: list[str] = Field(default_factory=list, max_length=8)
 
@@ -60,6 +60,11 @@ class ApprovalDecision(BaseModel):
     note: str | None = Field(default=None, max_length=500)
 
 
+class ResolutionRequest(BaseModel):
+    ticket_id: Literal[101, 103]
+    rationale: str = Field(min_length=8, max_length=1000)
+
+
 class AgentReply(BaseModel):
     status: Literal["ready", "needs_approval", "blocked", "draft_only"]
     summary: str = Field(min_length=1, max_length=1800)
@@ -67,6 +72,7 @@ class AgentReply(BaseModel):
     recommendations: list[str] = Field(default_factory=list, max_length=8)
     drafts: list[str] = Field(default_factory=list, max_length=5)
     approval_requests: list[ApprovalRequest] = Field(default_factory=list, max_length=3)
+    resolution_requests: list[ResolutionRequest] = Field(default_factory=list, max_length=1)
 
 
 class TicketOutcome(BaseModel):
@@ -96,7 +102,7 @@ class AgentEvent(BaseModel):
     ticket_id: int | None = None
     agent: AgentRole | Literal["System", "Human"] = "System"
     event_type: str
-    summary: str = Field(max_length=1200)
+    summary: str = Field(max_length=1800)
     tool_name: str | None = None
     delegated_to: AgentRole | None = None
     approval_id: str | None = None

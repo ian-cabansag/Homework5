@@ -1,61 +1,435 @@
 {
-  "record_type": "actual_ticket_run_snapshot",
-  "completion_status": "partially_resolved",
-  "financial_actions_status": "two_approved_payments_recorded",
-  "as_of": "2026-10-08",
-  "note": "This file records actual outcomes and database status. Ticket 102 was resolved after MCP verified its human-approved lease payment. Tickets 101 and 103 remain open because fulfillment and pricing/order disposition are outstanding.",
-  "cash_reconciliation": {
-    "starting_checking_balance": 3400.0,
-    "ticket_101_change": -840.0,
-    "ticket_102_change": -2400.0,
-    "ticket_103_change": 0.0,
-    "ending_checking_balance": 160.0,
-    "arithmetic": "3400.00 - 840.00 - 2400.00 - 0.00 = 160.00"
-  },
+  "status": "resolved",
+  "captured_at": "2026-10-14T17:41:30.665628+00:00",
+  "resolution_scope": "101 internal backorder plan; 102 paid rent; 103 internally declined bulk request. Not physical fulfillment.",
+  "reset_event_id": "11e04311-458a-44c1-a074-0b2bacf1ae5d",
+  "starting_balance_event_id": "f3f6bdce-dec6-4975-9464-82292f7f70a7",
+  "desk_date_today": "2026-08-31",
   "tickets": [
     {
-      "id": 101,
       "ticket_id": 101,
-      "final_status": "open",
-      "run_status": "needs_approval",
-      "outcome": "Size-S tee stock is zero. Ian approved and paid invoice 501 for $840, clearing Bulldog Print Co's open-invoice shipping block. A follow-up MCP check found the vendor eligible to ship, but no order or shipment was placed or verified, so the ticket remains open.",
+      "final_status": "resolved",
+      "outcome": "Internal backorder review completed; fulfillment remains unconfirmed.",
       "agent_contributions": [
-        {"agent": "Boss", "contribution": "Triaged the stockout, routed Inventory, and prepared the evidence-backed invoice approval proposal."},
-        {"agent": "Inventory", "contribution": "Verified zero size-S stock and that the vendor cannot ship while invoice 501 is open."}
+        {
+          "agent": "Inventory",
+          "summary": "Ticket 101 requests 1 × CC-TEE-WHITE, size S. Current stock is 0, so the requested unit is unavailable. Bulldog Print Co is listed for apparel reprints with a 5-day lead time, but vendor eligibility is false: open invoice 501 blocks the vendor from shipping new product. Therefore, no reprint shipment or fulfillment date is supportable; the order may only remain pending/backordered subject to resolving the vendor block. No future delivery is confirmed.",
+          "run_id": "540a4d64-e3e0-4cfb-924c-3ac1f84d63c9"
+        },
+        {
+          "agent": "Accounting",
+          "summary": "Database findings for ticket 101: Invoice 501, linked to ticket 101, is owed to Bulldog Print Co. for $840.00, is open, and was due 2026-08-28. The desk date is 2026-08-31. Checking balance is $3,400.00; the payment quote shows $2,560.00 after payment and confirms it can be paid if human-approved. Payment ledger is empty. Payment approval should be requested; no payment has been executed.",
+          "run_id": "540a4d64-e3e0-4cfb-924c-3ac1f84d63c9"
+        },
+        {
+          "agent": "Boss",
+          "summary": "Ticket 101 requests 1 Classic Bulldog Tee, size S. Recorded stock is 0, and Bulldog Print Co cannot ship new product while invoice 501 remains open. Invoice 501 is $840.00, overdue, and payment is feasible with human approval; no payment or vendor contact has occurred. Do not confirm fulfillment, shipment, or a delivery date. After payment, the ticket requires another review before any internal backorder disposition is proposed.",
+          "run_id": "540a4d64-e3e0-4cfb-924c-3ac1f84d63c9"
+        },
+        {
+          "agent": "Inventory",
+          "summary": "Ticket 101 requests 1 × CC-TEE-WHITE, size S. Current size-S stock is 0 in Aisle B, so the request cannot be fulfilled from stock. Replenishment/reprint may be recommended: Bulldog Print Co is listed for apparel reprints, has a 5-day database lead time, can ship this SKU/size/quantity, and has no open invoices. Invoice 501 for the rush reprint is paid. This supports an internal backorder/reprint recommendation only; no order, delivery promise, vendor contact, or inventory change is authorized or recorded.",
+          "run_id": "e1bcbc1b-eb6d-49ac-b237-52bf1bde6030"
+        },
+        {
+          "agent": "Boss",
+          "summary": "Ticket 101 is a stock-out for 1 Classic Bulldog Tee, size S. Recorded stock is zero. Invoice 501 for the rush reprint is fully paid, and the reprint vendor has no unpaid invoices, so an internal backorder/reprint disposition is eligible for operator approval. No vendor order, shipment, delivery date, or customer fulfillment has been confirmed.",
+          "run_id": "e1bcbc1b-eb6d-49ac-b237-52bf1bde6030"
+        }
+      ],
+      "delegations": [
+        {
+          "from": "Boss",
+          "to": "Inventory",
+          "reason": "Ticket 101 is a reprint request with zero stock; inventory expertise is needed to confirm the operational constraint and whether any reprint/replenishment disposition is supportable.",
+          "run_id": "540a4d64-e3e0-4cfb-924c-3ac1f84d63c9"
+        },
+        {
+          "from": "Boss",
+          "to": "Accounting",
+          "reason": "Ticket 101 has an open linked vendor invoice, so an explicit payment decision may be required before any internal backorder disposition can be proposed.",
+          "run_id": "540a4d64-e3e0-4cfb-924c-3ac1f84d63c9"
+        },
+        {
+          "from": "Boss",
+          "to": "Inventory",
+          "reason": "Ticket 101 requires a factual stock/reprint disposition and vendor eligibility check before any internal backorder recommendation.",
+          "run_id": "e1bcbc1b-eb6d-49ac-b237-52bf1bde6030"
+        }
+      ],
+      "mcp_tools_used": [
+        "execute_approved_payment",
+        "execute_approved_ticket_resolution",
+        "get_payment_quote",
+        "get_ticket_101_tee_reprint_context",
+        "get_ticket_resolution_quote",
+        "get_vendor_shipping_eligibility"
       ],
       "human_approvals": [
-        {"approval_id": "14690394-393d-4ffc-af21-41c3505fe22d", "decision": "approved", "approved_by": "Ian", "kind": "invoice", "reference_id": 501, "amount": 840.0, "payment_id": 1, "cash_changed": true, "balance_after_payment": 2560.0}
+        {
+          "approval_id": "3aef54d9-f2c2-4bc6-977a-765e9f11f40e",
+          "decision": "approve",
+          "approved_by": "Ian",
+          "note": "Operator explicitly authorized this action in the supervised final run."
+        },
+        {
+          "approval_id": "e4017a95-9398-4df1-9f6e-0ebacbaed9e7",
+          "decision": "approve",
+          "approved_by": "Ian",
+          "note": "Operator explicitly authorized this action in the supervised final run."
+        }
       ],
-      "audit_note": "The initial run stopped on an MCP argument mismatch; the retry completed with an approval proposal. Ian's approval and payment execution, followed by the vendor eligibility check, are recorded in the append-only audit trail."
+      "payments": [
+        {
+          "id": 1,
+          "kind": "invoice",
+          "ref_id": 501,
+          "amount": 840.0,
+          "account": "checking",
+          "paid_at": "2026-08-31",
+          "approved_by": "Ian"
+        }
+      ],
+      "cash_change": -840.0,
+      "resolution": {
+        "ticket_id": 101,
+        "disposition": "backorder_plan_approved",
+        "summary": "Internal backorder review completed; fulfillment remains unconfirmed.",
+        "draft": "Regarding your request for 1 Classic Bulldog Tee, size S: our recorded stock is 0. The linked reprint vendor is Bulldog Print Co, with a recorded lead time of 5 days. That lead time is not a delivery commitment. We cannot confirm shipment or a pickup date. This internal response and backorder plan require operator review; no vendor order or shipment is being claimed.",
+        "evidence_json": "{\"amount\": 0.0, \"blocked_reason\": null, \"can_finalize_if_human_approved\": true, \"cash_change\": 0.0, \"discount_authorized\": false, \"disposition\": \"backorder_plan_approved\", \"draft\": \"Regarding your request for 1 Classic Bulldog Tee, size S: our recorded stock is 0. The linked reprint vendor is Bulldog Print Co, with a recorded lead time of 5 days. That lead time is not a delivery commitment. We cannot confirm shipment or a pickup date. This internal response and backorder plan require operator review; no vendor order or shipment is being claimed.\", \"external_contact_made\": false, \"facts\": {\"desk_date_today\": \"2026-08-31\", \"inventory\": {\"location\": \"Aisle B\", \"name\": \"Classic Bulldog Tee\", \"qty\": 0, \"size\": \"S\", \"sku\": \"CC-TEE-WHITE\"}, \"invoice\": {\"amount\": 840.0, \"description\": \"Rush reprint CC-TEE-WHITE S\", \"due_date\": \"2026-08-28\", \"id\": 501, \"status\": \"paid\", \"vendor_id\": 1}, \"pricing\": {\"list_price\": 28.0, \"sku\": \"CC-TEE-WHITE\", \"unit_cost\": 8.0}, \"ticket\": {\"created_at\": \"2026-08-31T09:15:00-04:00\", \"id\": 101, \"invoice_id\": 501, \"lease_id\": null, \"notes\": \"Needs a tee in size S.\", \"qty\": 1, \"requester\": \"Tauhid Zaman\", \"size\": \"S\", \"sku\": \"CC-TEE-WHITE\", \"status\": \"open\", \"subject\": \"Bulldog tee\", \"type\": \"customer_order\"}, \"unpaid_invoices\": [], \"vendor\": {\"id\": 1, \"lead_days\": 5, \"name\": \"Bulldog Print Co\", \"specialty\": \"apparel reprint\"}}, \"fingerprint\": \"e3fb8e91396145753b7a47b95d620def29e7b19447ad5bbe21e2e8f4769d0eaf\", \"fulfillment_confirmed\": false, \"order_accepted\": false, \"resolution_scope\": \"internal_ticket_handling_only\", \"summary\": \"Internal backorder review completed; fulfillment remains unconfirmed.\", \"ticket_id\": 101}",
+        "approved_by": "Ian",
+        "approval_id": "e4017a95-9398-4df1-9f6e-0ebacbaed9e7",
+        "resolved_on": "2026-08-31"
+      },
+      "run_ids": [
+        "540a4d64-e3e0-4cfb-924c-3ac1f84d63c9",
+        "e1bcbc1b-eb6d-49ac-b237-52bf1bde6030"
+      ],
+      "audit_event_ids": [
+        "1047897a-f4de-40b0-b8fd-a8a6391e7d0d",
+        "9cbe91df-df32-4aaf-b93f-351f4a14c8c2",
+        "fa1d2463-3b4c-42ca-afee-977f4b36fa62",
+        "c2a1d008-0e72-48c8-8fff-060276f90a25",
+        "f7740d3f-3e19-4fc5-8919-d91f52ceb104",
+        "c3ec9224-3431-4cae-8a33-2392735f84d1",
+        "75cb4f5e-5f5a-42ed-a42f-6ce1cdf209e6",
+        "48418f2a-f12f-4ef6-82d6-6e7f2aa8cbb4",
+        "2834f120-79d5-463c-97a7-044a2aff0762",
+        "26f2e99b-0fa1-4be1-ae43-5260aa2b27a4",
+        "0150a983-add6-4280-b5bf-b268975fcb5e",
+        "0f54e119-8b2f-4df3-8584-25bd9257b7d5",
+        "98b8ecd1-a6b0-412e-9f63-1a2af9fd70bb",
+        "e60b472b-db91-4d0d-a804-b76c07fd4c8c",
+        "0f50ca9e-8fe8-4800-b948-883640a02f14",
+        "54a15848-59b1-4390-a6c9-dcaa6b723699",
+        "030fedf0-029d-4295-932b-e9ec7b188e0f",
+        "285968be-f175-4677-976f-18634bbfdfaf",
+        "7f0a466d-d99b-4e97-819c-b34783f8ab79",
+        "af45454d-7031-45bc-94e6-6d664c2ee9ab",
+        "67360ed5-cfd1-44e0-8a4c-e094fba062c6",
+        "e51b386a-6c79-4e5f-8839-632a5406651c",
+        "acfacbea-d79c-4c02-87cf-7fb7a96b6832",
+        "8db58646-f383-4fd9-880c-b00b6b5da1de",
+        "17cacf02-9c9b-42c1-b2e6-b9205ef6cb8c",
+        "b31a746e-c092-441f-bda9-3a63f63d105c",
+        "e8ebac15-d42a-466e-bfc0-f42b22b20a7c",
+        "715217c1-729b-47f4-b525-d7a42f5bb08b",
+        "d44cb29f-e774-4e30-92df-dbc2d624a2bd",
+        "5100139c-984a-4a1f-80d5-3bf52760b382",
+        "10930abc-1e97-4c2e-8029-c314b9c953a9",
+        "7cc2f99f-ff65-4471-87aa-a09bed16ee45",
+        "06ad30ee-e702-4aa8-a537-0e999567f021",
+        "c193183d-00fa-42a7-821e-21bb344e8ced",
+        "3a71d8a1-69fe-4c8e-b02b-fe91e80d87fc",
+        "b2cbf94a-2c41-45fa-86a8-7d5796ca5fd7",
+        "c7fca920-5197-4570-9942-c172efc8ff2b",
+        "de18b370-1d0d-44f3-b8b3-32e29c07428b",
+        "80db82a7-f947-47b3-a0f6-a01290112c8d",
+        "2c8a485b-2016-4262-a7f9-0aba04a8ff86",
+        "435eee0d-b4ae-4d76-9430-35eead2cf3b2",
+        "5eb28661-173a-4930-8a74-f2d04381311d",
+        "e36d9ba6-d260-4da5-a45d-6f322b3513c6",
+        "9eb5909f-c0d5-4991-bf48-808a5174b8c3",
+        "c0e966ce-8104-4d10-bf81-477301a44300",
+        "a7c64529-c208-4d6b-932c-9ec78a25dec7",
+        "bc073a0a-72f2-4876-959d-7a23c13c1a49",
+        "76a4bd1d-5346-4016-91f3-145703c094a9",
+        "ad717fd8-6fdd-40cf-aafd-1b2176484cfd",
+        "65a84cbf-7874-4745-9379-fece5abec4d2"
+      ],
+      "external_contact_made": false
     },
     {
-      "id": 102,
       "ticket_id": 102,
       "final_status": "resolved",
-      "run_status": "needs_approval",
-      "outcome": "Ian approved and paid Lease 1 rent of $2,400, due 2026-09-02. MCP verified the full approved payment and resolved ticket 102. Checking ended at $160.00; no landlord contact occurred.",
+      "outcome": "The linked rent notice was resolved after the approved lease payment was recorded.",
       "agent_contributions": [
-        {"agent": "Boss", "contribution": "Coordinated lease verification and cash/payment assessment."},
-        {"agent": "Facilities", "contribution": "Verified the Chapel Street lease, landlord, rent amount, due date, and consistency with the desk date."},
-        {"agent": "Accounting", "contribution": "Quoted payment feasibility and prepared a human approval request without moving cash."}
+        {
+          "agent": "Accounting",
+          "summary": "Ticket 102 lease payment is feasible on the recorded checking balance, but it requires explicit human approval. The database records $2,560.00 in checking as of 2026-08-31; the lease payment quote is $2,400.00, leaving $160.00 after payment. The payment ledger also records invoice 501 for $840.00 paid from checking on 2026-08-31 with Ian’s approval. No payment was executed or marked paid.",
+          "run_id": "a41ae7b8-eedb-4514-af37-38dae72c3569"
+        },
+        {
+          "agent": "Accounting",
+          "summary": "Ticket 102: Lease 1 rent of $2,400 is feasible against the recorded checking balance without making checking negative. The database records $2,560.00 in checking as of shop date 2026-08-31; the payment quote calculates $160.00 remaining after payment. Rent is due 2026-09-02. No payment was authorized or executed.",
+          "run_id": "a41ae7b8-eedb-4514-af37-38dae72c3569"
+        },
+        {
+          "agent": "Facilities",
+          "summary": "Ticket 102: Rent notice is consistent with the lease record. Elm City Properties is landlord for the Chapel Street shop; monthly rent is $2,400 and next due date is 2026-09-02, two days after the database shop date 2026-08-31. Checking is $2,560 as of 2026-08-31; Accounting finds payment feasible with $160 remaining, but no payment was authorized or made. Lease notes are blank, so late fees, grace period, and payment instructions are not evidenced.",
+          "run_id": "a41ae7b8-eedb-4514-af37-38dae72c3569"
+        },
+        {
+          "agent": "Accounting",
+          "summary": "Lease 1 payment is feasible but requires explicit human approval. The recorded rent obligation/payment quote is $2,400.00. Current checking is $2,560.00, leaving $160.00 after payment, so checking remains nonnegative. No payment was authorized or executed.",
+          "run_id": "249cf388-90e3-4018-80c3-5db09529ed74"
+        },
+        {
+          "agent": "Facilities",
+          "summary": "Ticket 102 lease notice verified for lease 1 (Chapel Street shop). Landlord: Elm City Properties. Monthly rent: $2,400.00. Next due date: 2026-09-02; the database desk date is 2026-08-31, so the notice is due in 2 days. The lease record has no additional notes or recorded constraints. No payment-feasibility assessment or payment action was performed.",
+          "run_id": "249cf388-90e3-4018-80c3-5db09529ed74"
+        },
+        {
+          "agent": "Boss",
+          "summary": "Ticket 102 rent notice is verified. Lease 1 for the Chapel Street shop, owed to Elm City Properties, is $2,400 due 2026-09-02—two days after the recorded shop date of 2026-08-31. Accounting found payment feasible: checking is $2,560, leaving $160 after payment. Explicit human approval is required; no payment was authorized or executed.",
+          "run_id": "249cf388-90e3-4018-80c3-5db09529ed74"
+        }
+      ],
+      "delegations": [
+        {
+          "from": "Boss",
+          "to": "Facilities",
+          "reason": "Ticket 102 is a rent notice and Facilities owns lease-term interpretation.",
+          "run_id": "a41ae7b8-eedb-4514-af37-38dae72c3569"
+        },
+        {
+          "from": "Boss",
+          "to": "Accounting",
+          "reason": "Ticket 102 requires a payment-feasibility check against current checking balance and recorded cash outflows.",
+          "run_id": "a41ae7b8-eedb-4514-af37-38dae72c3569"
+        },
+        {
+          "from": "Facilities",
+          "to": "Accounting",
+          "reason": "Cash feasibility is relevant because rent is due 2026-09-02 and checking balance is only $2,560.",
+          "run_id": "a41ae7b8-eedb-4514-af37-38dae72c3569"
+        },
+        {
+          "from": "Boss",
+          "to": "Facilities",
+          "reason": "Ticket 102 is a rent notice; lease terms and due date need specialist verification.",
+          "run_id": "249cf388-90e3-4018-80c3-5db09529ed74"
+        },
+        {
+          "from": "Boss",
+          "to": "Accounting",
+          "reason": "Ticket 102 requires determining whether the recorded checking balance can support the lease payment.",
+          "run_id": "249cf388-90e3-4018-80c3-5db09529ed74"
+        }
+      ],
+      "mcp_tools_used": [
+        "execute_approved_payment",
+        "get_payment_quote",
+        "get_ticket_102_rent_and_cash_context"
       ],
       "human_approvals": [
-        {"approval_id": "e997b31a-988a-4f31-b1c6-b2be81fb28af", "decision": "approved", "approved_by": "Ian", "kind": "lease", "reference_id": 1, "amount": 2400.0, "payment_id": 2, "cash_changed": true, "balance_after_payment": 160.0}
+        {
+          "approval_id": "f2706b8e-c7ef-4873-ab59-67913d5eadec",
+          "decision": "approve",
+          "approved_by": "Ian",
+          "note": "Operator explicitly authorized this action in the supervised final run."
+        }
       ],
-      "resolution": {"status": "resolved", "basis": "MCP verified the matching full lease payment and recorded approver before closing the rent notice.", "external_contact_made": false}
+      "payments": [
+        {
+          "id": 2,
+          "kind": "lease",
+          "ref_id": 1,
+          "amount": 2400.0,
+          "account": "checking",
+          "paid_at": "2026-08-31",
+          "approved_by": "Ian"
+        }
+      ],
+      "cash_change": -2400.0,
+      "resolution": null,
+      "run_ids": [
+        "a41ae7b8-eedb-4514-af37-38dae72c3569",
+        "249cf388-90e3-4018-80c3-5db09529ed74"
+      ],
+      "audit_event_ids": [
+        "2424cbf5-5b58-46cd-85f5-31754330c576",
+        "62573670-769b-4c17-bd55-0fcfdd25bcf7",
+        "649575ff-bdc0-4392-b359-68e7e17c5441",
+        "4c9016b8-be8b-40d0-ac37-54ce5587b616",
+        "a0e7f415-2556-47e5-bc9a-47d07f9fb9fe",
+        "f3b05768-b7e3-4784-9005-909329470f11",
+        "19704937-4416-409f-944c-b1e5fab377d2",
+        "11db20c5-3f45-458d-aec7-cca85473e6fd",
+        "0f7314d0-2358-465c-9f12-63eb4f4ed415",
+        "ff79dd89-fdf3-4f14-85f3-c06909524187",
+        "1d64f77d-cdbd-4d13-8a1b-44a04933cda5",
+        "b9e6e7e2-1bcb-4bd4-b095-d0b5576a7f3f",
+        "734b125e-666d-4a71-9fff-2300e8e7c1b3",
+        "5c5c0f95-fa93-443a-b067-b65e3fa84c6b",
+        "74343235-1c27-47f1-847d-499d8ef2b34d",
+        "4fdced32-bfff-427e-a878-d414573f2e3c",
+        "600e6b40-b77c-44a0-81f6-b0abb6437ee0",
+        "cd1ab8c9-5709-47ee-88bd-c1bff763fb58",
+        "4188ec83-c5fd-4a62-8fe7-c3db914fa8ec",
+        "48ff090a-b9be-47a2-95db-c3507727d4ea",
+        "99f13f25-37c7-4262-b339-97b1c321887b",
+        "9682a3ac-001b-49ca-9020-bc483fc3b739",
+        "013825c9-6b1c-423b-a09d-3b0e8e4e915e",
+        "12e86145-f537-438d-bffe-7d996b965f6f",
+        "b47dcc98-9a04-48da-a728-be25faabf238",
+        "6d077881-3d3d-44d3-beda-044404fdaa5d",
+        "e55a4a0f-d50e-4536-a251-3cb95a271d88",
+        "50b5e2c4-d8fa-4722-a016-960698ea38e1",
+        "b1d9c4d5-36c7-4cfd-9ad1-5265bd0106eb",
+        "deb7a398-bd62-4a2b-aae0-590078a91854",
+        "84f5274a-e785-459e-b5a3-69a65aeba3d4",
+        "02305592-c06e-4efa-b8eb-dbd467827366",
+        "fe7b65ff-9ec1-4684-b4a9-0a9bad049d9d",
+        "666cf798-3592-46d2-bc71-beb88ca9ed8f",
+        "a98dcfdb-6aee-466e-926a-67da12cdcd6e",
+        "7fc818c5-1cba-4e71-a458-307724c970c1",
+        "8d7058d6-a0d1-494c-9702-623cb36b735b",
+        "5509b5f5-35b4-4937-a763-dd0fa1ede61c",
+        "100ada75-7387-420d-8a4f-c99e739d9a91",
+        "7828e7c0-3ff4-49bd-9b2f-3f7e4eb6983c",
+        "409d3617-1d4c-4666-b5ef-2aa06df8048c",
+        "9c7eca89-d324-4e4d-bded-d9f4af3ba923",
+        "2433faed-1c5f-47d8-881f-c5285dbcf508",
+        "9d24e7fa-4497-486d-b871-8cfc9be7b292",
+        "2230c42d-557a-41bc-a969-7ccea5b173d5",
+        "23c9d6c2-26e1-4a43-902e-65b0062b9cbe",
+        "85f49228-b238-4e6c-af9e-3521a47c3715",
+        "2299318d-1389-4211-bcce-a5fb753c178a",
+        "70077b70-8eb6-42cf-b25b-4964c697e827",
+        "02746c60-62e8-4a08-9811-f65a6c561a8e",
+        "2ea1ddad-f4ff-47f3-ad43-6981bf0b89c3",
+        "5d546142-e520-4fa9-916d-720b2cba3ffc",
+        "c066b814-29d0-4cb5-8619-e2ea46c3caa5",
+        "a7d949a0-6003-4ae2-be49-73ab95ce99d0",
+        "aef2de2f-5d04-4837-960d-8042c9e2e40f"
+      ],
+      "external_contact_made": false
     },
     {
-      "id": 103,
       "ticket_id": 103,
-      "final_status": "open",
-      "run_status": "draft_only",
-      "outcome": "Eight size-M hoodies are recorded against a request for twenty. No discount is approved; an internal customer reply was drafted but not sent. The request remains open for a human decision.",
+      "final_status": "resolved",
+      "outcome": "Requested bulk quantity/discount declined internally; alternative availability drafted without accepting an order.",
       "agent_contributions": [
-        {"agent": "Boss", "contribution": "Synthesized the stock and pricing evidence and recommended not accepting the full order or inventing a discount."},
-        {"agent": "Inventory", "contribution": "Verified the 12-unit size-M shortfall and advised against promising unconfirmed replenishment."},
-        {"agent": "Customer Service", "contribution": "Prepared an internal, noncommittal customer response; did not send it."}
+        {
+          "agent": "Inventory",
+          "summary": "Ticket 103 requests 20 units of CC-HOOD-NAVY, size M. The stock record shows 8 units currently available in size M at Aisle A, leaving a shortfall of 12 units. Therefore, the requested quantity is not currently available. No future replenishment or delivery is recorded, so fulfillment of the full quantity cannot be confirmed.",
+          "run_id": "b316897b-3b22-47de-9214-592232ce6fa0"
+        },
+        {
+          "agent": "Customer Service",
+          "summary": "Ticket 103 response drafted from the recorded hoodie stock and pricing evidence. The requested quantity exceeds available size-M stock, and no bulk discount is confirmed.",
+          "run_id": "b316897b-3b22-47de-9214-592232ce6fa0"
+        },
+        {
+          "agent": "Boss",
+          "summary": "Ticket 103: Yale AI Club requested 20 navy Basic Hoodie Big Yale hoodies, size M, with a bulk discount. Recorded stock is 8 units, so the requested quantity is short by 12; no replenishment or delivery date is recorded. List price is $58.00 per unit and no bulk discount is authorized. Recommend operator approval to decline the requested quantity/discount and use the unsent availability response below. No order is accepted, stock is not reserved, and no fulfillment is confirmed.",
+          "run_id": "b316897b-3b22-47de-9214-592232ce6fa0"
+        }
       ],
-      "human_approvals": []
+      "delegations": [
+        {
+          "from": "Boss",
+          "to": "Inventory",
+          "reason": "Ticket 103 requests 20 units of a specific SKU/size; inventory should confirm the actionable availability constraint from the stock record.",
+          "run_id": "b316897b-3b22-47de-9214-592232ce6fa0"
+        },
+        {
+          "from": "Boss",
+          "to": "Customer Service",
+          "reason": "Ticket 103 needs an unsent, customer-safe response addressing the quantity shortfall and discount request without committing the shop.",
+          "run_id": "b316897b-3b22-47de-9214-592232ce6fa0"
+        }
+      ],
+      "mcp_tools_used": [
+        "execute_approved_ticket_resolution",
+        "get_ticket_103_hoodie_stock_and_pricing",
+        "get_ticket_resolution_quote"
+      ],
+      "human_approvals": [
+        {
+          "approval_id": "106e6494-d9df-4f65-b2a8-314c254ccf3b",
+          "decision": "approve",
+          "approved_by": "Ian",
+          "note": "Operator explicitly authorized this action in the supervised final run."
+        }
+      ],
+      "payments": [],
+      "cash_change": 0,
+      "resolution": {
+        "ticket_id": 103,
+        "disposition": "bulk_request_declined",
+        "summary": "Requested bulk quantity/discount declined internally; alternative availability drafted without accepting an order.",
+        "draft": "Regarding your request for 20 Basic Hoodie Big Yale, size M: our recorded stock is 8, so we cannot fulfill the requested quantity from current stock. We are not approving a bulk discount. The recorded list price is $58.00 per unit. An availability alternative can be discussed, but no units are reserved and no order is accepted. This response is an internal, unsent draft.",
+        "evidence_json": "{\"amount\": 0.0, \"blocked_reason\": null, \"can_finalize_if_human_approved\": true, \"cash_change\": 0.0, \"discount_authorized\": false, \"disposition\": \"bulk_request_declined\", \"draft\": \"Regarding your request for 20 Basic Hoodie Big Yale, size M: our recorded stock is 8, so we cannot fulfill the requested quantity from current stock. We are not approving a bulk discount. The recorded list price is $58.00 per unit. An availability alternative can be discussed, but no units are reserved and no order is accepted. This response is an internal, unsent draft.\", \"external_contact_made\": false, \"facts\": {\"desk_date_today\": \"2026-08-31\", \"inventory\": {\"location\": \"Aisle A\", \"name\": \"Basic Hoodie Big Yale\", \"qty\": 8, \"size\": \"M\", \"sku\": \"CC-HOOD-NAVY\"}, \"pricing\": {\"list_price\": 58.0, \"sku\": \"CC-HOOD-NAVY\", \"unit_cost\": 22.0}, \"ticket\": {\"created_at\": \"2026-08-31T16:55:00-04:00\", \"id\": 103, \"invoice_id\": null, \"lease_id\": null, \"notes\": \"Student org wants 20 hoodies, size M, asking for a bulk discount.\", \"qty\": 20, \"requester\": \"Yale AI Club\", \"size\": \"M\", \"sku\": \"CC-HOOD-NAVY\", \"status\": \"open\", \"subject\": \"Bulk hoodie discount\", \"type\": \"price_override\"}}, \"fingerprint\": \"ea719dcc0bae19bf44c95030edcadd4796ee437f9e3fd20a532c0e7844683d17\", \"fulfillment_confirmed\": false, \"order_accepted\": false, \"resolution_scope\": \"internal_ticket_handling_only\", \"summary\": \"Requested bulk quantity/discount declined internally; alternative availability drafted without accepting an order.\", \"ticket_id\": 103}",
+        "approved_by": "Ian",
+        "approval_id": "106e6494-d9df-4f65-b2a8-314c254ccf3b",
+        "resolved_on": "2026-08-31"
+      },
+      "run_ids": [
+        "b316897b-3b22-47de-9214-592232ce6fa0"
+      ],
+      "audit_event_ids": [
+        "dcc4404b-7327-4870-b05e-7f7c926ede8c",
+        "ba4566e3-8530-45df-97e6-20171f1c2889",
+        "1a06c604-247e-4f9e-af55-63f5e5a8265d",
+        "4cccc9dc-fc6e-4d85-b137-abd053454e37",
+        "4c6cecf6-75d0-4bd2-8953-23c68be3b383",
+        "4a460c24-b6b8-43c4-998d-f5d48e82f837",
+        "f6c3ec9d-3cd8-4b0c-b097-8e2ecb0ab56b",
+        "6fdcdb49-c9e4-4242-8f9f-da511a474f9f",
+        "64131760-5606-412b-8af6-a318b04ab2a8",
+        "2aef7ffa-304b-4bf9-b3d2-154b82bd1f76",
+        "b237da9c-8ec8-4a8f-8a5a-5dea2b2e431b",
+        "33d184fc-4ae0-4cb9-b9c8-885f17b94d3b",
+        "655d8e9c-3c22-4d0a-9c5d-75b10b921834",
+        "afb7af1b-35fc-4d59-b58e-c38e0cfa33f5",
+        "9f06a805-516b-4a73-828f-18fb342f6fa1",
+        "efadc0d3-b203-4efe-b562-bc3c714e9289",
+        "e86b87dc-6fce-4230-b444-b1389da77264",
+        "675559ce-6738-41ed-a5e9-2e1f7e3c7a5a",
+        "41084f3b-3961-4339-87a1-2b8a98f48d31",
+        "1e055903-d0c0-400c-a9f0-948bfdd9d84c",
+        "682dd885-cc86-463d-97fd-2c799d559d04",
+        "7751641f-a4c7-4341-9bfb-47ac2ea538dd",
+        "eccb7a72-211c-4336-b019-2efb424af099"
+      ],
+      "external_contact_made": false
     }
-  ]
+  ],
+  "cash_reconciliation": {
+    "starting_checking_balance": 3400.0,
+    "payments": [
+      {
+        "id": 1,
+        "kind": "invoice",
+        "ref_id": 501,
+        "amount": 840.0,
+        "account": "checking",
+        "paid_at": "2026-08-31",
+        "approved_by": "Ian"
+      },
+      {
+        "id": 2,
+        "kind": "lease",
+        "ref_id": 1,
+        "amount": 2400.0,
+        "account": "checking",
+        "paid_at": "2026-08-31",
+        "approved_by": "Ian"
+      }
+    ],
+    "ending_checking_balance": 160.0,
+    "incoming_revenue": 0
+  }
 }

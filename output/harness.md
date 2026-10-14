@@ -2,10 +2,10 @@
 
 Problem 2 records the source database as found, the working copy, and the data relationships relevant to tickets 101–103. This is a factual reference for later implementation; no ticket has been processed here.
 
-## Database files and current operating values
+## Database files and source baseline (before the recorded run)
 
 - Original source: `data/campus_customs.db` (53,248 bytes; SQLite integrity check: `ok`).
-- Working database: `data/campus_customs_new.db`, copied from the original without schema or row changes.
+- Working database: `data/campus_customs_new.db`, initially copied from the original. The source baseline below is historical; see the final-run section and `resolved_tickets.json` for the verified current state.
 - Shop date (`desk.date_today`): **2026-08-31**. Use this database value as “today.”
 - Checking balance (`cash_accounts` row `checking`): **$3,400.00**, dated **2026-08-31**.
 - The original contains nine application tables and three open tickets: 101, 102, and 103.
@@ -98,13 +98,13 @@ The team and FastAPI routes use these MCP tools from `mcp_server/server.py`:
 | `execute_approved_payment` | `cash_accounts`, `desk`, `invoices` or `leases`, `payments`, `tickets` | Write an outgoing payment and update checking only after explicit human approval; transactionally rechecks amount, open/unpaid state, and nonnegative cash. A linked rent notice is resolved in the same transaction. This tool is excluded from every agent's MCP allowlist. |
 | `resolve_paid_rent_notice` | `tickets`, `leases`, `payments` | Reconcile ticket 102 after a full approved lease payment already exists; refuses if payment amount or approver evidence is missing. No cash change. |
 | `get_dashboard_tickets` | `tickets` | Read tickets 101–103 and their actual status for the API/dashboard. |
-| `get_checking_balance` | `cash_accounts` | Read the current checking balance/date for the API/dashboard. |
+| `get_checking_balance` | `cash_accounts`, `desk` | Read checking, its recorded date, and the independent authoritative shop date for the API/dashboard. |
 | `reset_working_database` | Original and working database files; validates SQLite integrity | Administrative reset only: replace the working DB with a verified copy of the original. Never writes the original. |
 
 ### Safety and loop controls
 
 - Every AI call uses the single model name **`gpt-6-Luna` through Portkey**. All five PydanticAI agents share the same configured Portkey-backed model; no fallback model is configured.
-- Backend business-data access is exclusively through the MCP client. Read-only tools use SQLite read-only/query-only connections; only the MCP payment tool writes the working copy. The original `data/campus_customs.db` is never opened by the MCP server.
+- Backend business-data access is exclusively through the MCP client. Read-only tools use SQLite read-only/query-only connections. MCP owns payment writes, paid-rent reconciliation, and administrative reset. The original is read only as the source of an explicit reset and is never modified.
 - `desk.date_today` is the only shop date. Vendor lead time and open invoice status come from `vendors`/`invoices`. A vendor with an open invoice cannot ship new product.
 - Cash only goes out. Agents cannot invoke the payment tool. A payment proposal is checked against `get_payment_quote`; an operator must explicitly approve through the API. The MCP server then requires a short-lived backend approval token, rechecks the obligation and balance inside a write transaction, and refuses a negative checking balance.
 - There is no sales/revenue write, no customer email, and no vendor-contact tool. Customer/vendor text remains a draft.
@@ -134,12 +134,58 @@ Payment requests are re-quoted from the working DB and require an eligible oblig
 
 `frontend/` contains the React + Vite + TypeScript supervision UI. It calls `http://localhost:8000`, polls audit activity and pending approvals every four seconds, and refreshes database-backed ticket/cash state every twenty seconds and after actions. Approve is explicit, requires an approver name, and only reports a cash change when the API confirms `cash_changed: true`. Current executable approval support is invoice/lease only; purchase approval remains disabled because there is no purchase-order operation in the database/API. Verify with `npm run typecheck` and `npm run build` from `frontend/`.
 
-## Problem 9 real run status and reconciliation
+## Historical partial run — superseded by the clean final run below
 
 The genuine run events are append-only in `output/audit_trail.json`. Ticket 101's first attempt stopped on an MCP argument mismatch; the retry completed as `needs_approval`. Ticket 102 completed as `needs_approval`; ticket 103 completed as `draft_only`. Ian explicitly approved invoice 501 ($840) and Lease 1 rent ($2,400) through the API approval route. Both payment executions and approvals are recorded in the audit; invoice 501 is paid, the payments ledger has two outgoing rows, and checking is $160.00. Ticket 102 was resolved only after MCP verified its paid lease record. Ticket 101's post-payment MCP eligibility check confirms the vendor may ship, but no shipment is confirmed; ticket 101 remains open. Ticket 103 remains open pending pricing/order disposition. Cash reconciliation: $3,400.00 − $840.00 − $2,400.00 − $0.00 = $160.00. This is not a three-ticket resolution.
 
-## Problem 10 reflection and current evidence limits
+## Historical Problem 10 evidence limits — before the final workflow
 
 The Reflection tab in `output/desk_tickets.html` compares the expected routes with actual participation, duplicated MCP reads, the blocked delegation cycle, both approved payments, and the resulting cash. It also describes supported and unsupported future tasks. `output/resolved_tickets.json` records the actual ticket status for each request. Only ticket 102 is resolved; tickets 101 and 103 remain open. No three-ticket resolved dashboard screenshots are claimed. A final completion still needs legitimate dispositions for 101 and 103, a matching DB and audit trail, and genuine dashboard screenshots.
 
 Current working-database snapshot after the human-approved payments: invoice 501 is `paid`; the payment ledger records $840 to invoice 501 and $2,400 to Lease 1, both approved by Ian; checking is $160.00. Ticket 102 is `resolved` after the rent-payment guard verified its obligation was paid; tickets 101 and 103 remain `open`. A post-payment MCP eligibility read confirms vendor 1 has no open invoices and is eligible to ship, but no shipment/receipt is recorded. The original database file remains byte-for-byte unchanged.
+
+## Earlier audit corrections and reproducible checks
+
+- Payment decisions, runs, and resets share one operation lock in the single-worker backend. The transaction requires the exact amount shown in the human-reviewed proposal, checks finite whole-cent financial values, and rejects duplicate or unaffordable payments.
+- A reset records an append-only generation boundary under that lock. Earlier approval IDs cannot execute against the new database. `/events` defaults to the current generation; `/events?include_history=true` exposes the preserved history. Use the API reset route, or `python scripts/reset_working_db.py --confirm` with the API stopped.
+- MCP session contexts unwind fully on successful calls, rejected payments, and initialization failures. The one-time approval token is confined to the payment subprocess and never logged.
+- `get_checking_balance` now reads both `cash_accounts` and `desk`, so the displayed shop date cannot drift with the last cash transaction date.
+- Future run outcomes, including internal drafts and specialist reports, are saved in the final audit event. The dashboard restores them after refresh, labels them as historical reviews, and displays internal drafts. Older runs retain only the information originally recorded; missing old draft text is not reconstructed.
+- The agent/audit summary limits now agree at 1,800 characters; valid long agent summaries no longer fail audit validation. The MCP-call cap is enforced before incrementing, using the shared 12-call constant.
+- Fresh `output/mcp_smoke.json` results match every field in the current working DB. The pre-payment smoke capture remains in `output/mcp_smoke_initial.json`. `output/database_audit.json` contains all source/working table fields, foreign keys, actual rows, integrity checks, and hashes.
+- `output/resolved_board.html` now embeds actual screenshots for all three selected tickets. Screenshots and DB consistently show Open / Resolved / Open and $160. This remains a partial run, not three resolved tickets.
+- Regression commands, normal startup, offline reset, and browser capture instructions are in the root README. `output/final_audit.md` separates observed passes from the remaining resolution and IDE-connection gaps.
+
+## Clean final run — October 14, 2026 (supersedes partial-run notes above)
+
+The real working database was reset from the unchanged original through the API/MCP reset operation. The audit records the reset and an MCP-verified $3,400 starting checking balance. Shop date remains 2026-08-31. Ian explicitly approved invoice 501 ($840), lease 1 ($2,400), ticket 101's internal backorder plan after payment, and ticket 103's internally declined quantity/discount request with an unsent response.
+
+All three database ticket statuses are now `resolved`. Ticket 101 ran twice: before and after invoice payment. Ticket 102's first review failed on payment-quote argument aliases after redundant Accounting delegation; the adapter and routing instructions were corrected and the retry completed. Ticket 103 used Inventory and Customer Service. All meaningful steps, failed attempts, proposals and human actions remain in the append-only audit. Exact run IDs, contributions, delegations, tools, approval IDs and dispositions are in `resolved_tickets.json`.
+
+Cash: $3,400 − $840 (invoice 501 / ticket 101) − $2,400 (lease 1 / ticket 102) − $0 (ticket 103) = **$160**, verified against `cash_accounts` and both `payments` rows. Internal dispositions do not move cash or stock. Ticket 101 closure does not establish shipment or fulfillment; ticket 103 closure does not authorize a discount, reserve stock or accept an order. All drafts remain unsent.
+
+### Final MCP additions (14 tools total)
+
+The preceding 11-tool table remains applicable, plus:
+
+| Tool | Tables | Purpose / guard |
+|---|---|---|
+| `get_ticket_resolution_quote` | `tickets`, `inventory`, `pricing`, `desk`; 101 also `invoices`, `vendors`, `payments` | Exact internal disposition/draft, eligibility and evidence fingerprint for a human review. |
+| `execute_approved_ticket_resolution` | Same quote tables; writes `tickets`, `ticket_resolutions` | One-time backend approval token, named human, unchanged evidence fingerprint and transaction-time prerequisite checks. Marks internal handling resolved without cash, stock or external effects. |
+| `get_ticket_resolution_record` | `ticket_resolutions` | Reads the stored approved internal disposition, draft and audit link; null before it exists. |
+
+### Working-only table
+
+`ticket_resolutions` is created only in the working DB when an approved internal disposition executes. Fields: `ticket_id` INTEGER PK/FK to tickets.id; `disposition`, `summary`, `draft`, `evidence_json`, `approved_by`, `approval_id`, `resolved_on` TEXT NOT NULL. `approval_id` is UNIQUE. UPDATE/DELETE triggers enforce append-only history. `evidence_json` preserves the reviewed pre-resolution quote; its embedded open ticket status is a historical fact, not the current ticket status. Reset removes this working extension by restoring the original nine-table DB.
+
+### API, dashboard and limits
+
+`GET /approvals/pending` now includes financial and internal-disposition proposals. `POST /approvals/{approval_id}/decision` executes the appropriate MCP action only after a named human approves; resolution responses explicitly report `cash_changed:false`. Agent tool permissions remain read-only. The dashboard shows the exact draft in the approval card and a verified-final-disposition card above the historical review. Arbitrary purchase orders are still unsupported and disabled.
+
+All five AI roles use only **gpt-6-Luna through Portkey**. Per ticket review: at most 5 agent invocations, 3 delegations, depth 2, 12 MCP calls. Per agent invocation: 4 model requests, 6 tool calls, 8,000 total tokens; one output retry. Cycles are stopped; limits are not silently raised after a failure. The application runs one backend worker; use the offline supervisor only when other API instances are stopped. No model or MCP call receives permission to invent incoming revenue or contact customers/vendors.
+
+Final evidence is generated from read-only verification of the DB and current audit generation using `scripts/finalize_evidence.py`, followed by independent MCP/SQL comparison with `scripts/verify_evidence.py`. Earlier evidence is under `output/prior_run/`; earlier audit records remain in place. Actual and Reflection discuss both correct behavior and observed mistakes; Expected plans are preserved. `scripts/capture_dashboard.mjs` captures the real resolved UI, checks mobile/reload behavior and all five standalone tabs. `scripts/scan_secrets.py` checks source/evidence and Git history without displaying secrets.
+
+### IDE connection qualification
+
+`.mcp.json` and the committed `.codex/config.toml` use the portable launcher. Open HW5 itself as the trusted project root and reload Codex/VS Code. Codex's configuration disables write tools in the IDE. `mcp_smoke.json` proves real stdio MCP calls with exact DB comparisons; it does not claim an IDE-host tool invocation. That final host step must be verified after reload.

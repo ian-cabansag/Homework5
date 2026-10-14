@@ -1,0 +1,5 @@
+[mcp_servers.campus_customs]
+command = "python"
+args = ["scripts/start_mcp.py"]
+startup_timeout_sec = 60
+disabled_tools = ["reset_working_database", "execute_approved_payment", "execute_approved_ticket_resolution", "resolve_paid_rent_notice"]

@@ -1,49 +1,215 @@
 {
   "verification": {
-    "mcp_interface": "Real FastMCP stdio calls through backend MCPGateway",
-    "database_at_capture": "data/campus_customs_new.db in its clean initial state, before Problem 9 payments",
-    "database_check": "All three saved tool outputs were compared field-by-field with direct read-only SQLite queries. The captured values also match the untouched data/campus_customs.db. The working DB has since changed only through the two human-approved payments documented in the audit trail.",
-    "note": "These are the real initial MCP smoke-test calls. They were read-only; no database changes or AI model calls were made during the smoke tests."
+    "captured_at": "2026-10-14T17:41:50.934158+00:00",
+    "mcp_interface": "Real FastMCP stdio calls through backend MCPGateway (not an IDE tool invocation)",
+    "database": "data/campus_customs_new.db",
+    "sha256": "1b556fa73db1a753ef446f9188a33a11b71c71200cf0720ca736aef02c078bac",
+    "database_check": "Every returned field compared with independent read-only SQL; all equal.",
+    "tools_available": [
+      "execute_approved_payment",
+      "execute_approved_ticket_resolution",
+      "get_checking_balance",
+      "get_dashboard_tickets",
+      "get_payment_quote",
+      "get_ticket_101_tee_reprint_context",
+      "get_ticket_102_rent_and_cash_context",
+      "get_ticket_103_hoodie_stock_and_pricing",
+      "get_ticket_resolution_quote",
+      "get_ticket_resolution_record",
+      "get_vendor_shipping_eligibility",
+      "list_vendors",
+      "reset_working_database",
+      "resolve_paid_rent_notice"
+    ],
+    "ai_calls": 0
   },
   "tests": [
     {
-      "prompt": "Read the factual context for open ticket 101, including relevant shop records.",
+      "prompt": "Read the current factual records for ticket 101.",
       "tool_name": "get_ticket_101_tee_reprint_context",
+      "arguments": {},
       "returned_output": {
-        "ticket": {"id": 101, "type": "customer_order", "requester": "Tauhid Zaman", "subject": "Bulldog tee", "sku": "CC-TEE-WHITE", "size": "S", "qty": 1, "lease_id": null, "invoice_id": 501, "status": "open", "notes": "Needs a tee in size S.", "created_at": "2026-08-31T09:15:00-04:00"},
-        "inventory": {"sku": "CC-TEE-WHITE", "name": "Classic Bulldog Tee", "size": "S", "qty": 0, "location": "Aisle B"},
-        "pricing": {"sku": "CC-TEE-WHITE", "unit_cost": 8.0, "list_price": 28.0},
-        "invoice": {"id": 501, "vendor_id": 1, "amount": 840.0, "due_date": "2026-08-28", "status": "open", "description": "Rush reprint CC-TEE-WHITE S"},
-        "vendor": {"id": 1, "name": "Bulldog Print Co", "specialty": "apparel reprint", "lead_days": 5},
-        "checking": {"name": "checking", "balance": 3400.0, "date": "2026-08-31"},
+        "ticket": {
+          "id": 101,
+          "type": "customer_order",
+          "requester": "Tauhid Zaman",
+          "subject": "Bulldog tee",
+          "sku": "CC-TEE-WHITE",
+          "size": "S",
+          "qty": 1,
+          "lease_id": null,
+          "invoice_id": 501,
+          "status": "resolved",
+          "notes": "Needs a tee in size S.",
+          "created_at": "2026-08-31T09:15:00-04:00"
+        },
+        "inventory": {
+          "sku": "CC-TEE-WHITE",
+          "name": "Classic Bulldog Tee",
+          "size": "S",
+          "qty": 0,
+          "location": "Aisle B"
+        },
+        "pricing": {
+          "sku": "CC-TEE-WHITE",
+          "unit_cost": 8.0,
+          "list_price": 28.0
+        },
+        "invoice": {
+          "id": 501,
+          "vendor_id": 1,
+          "amount": 840.0,
+          "due_date": "2026-08-28",
+          "status": "paid",
+          "description": "Rush reprint CC-TEE-WHITE S"
+        },
+        "vendor": {
+          "id": 1,
+          "name": "Bulldog Print Co",
+          "specialty": "apparel reprint",
+          "lead_days": 5
+        },
+        "checking": {
+          "name": "checking",
+          "balance": 160.0,
+          "date": "2026-08-31"
+        },
         "desk_date_today": "2026-08-31",
-        "payment_ledger": []
-      }
+        "payment_ledger": [
+          {
+            "id": 1,
+            "kind": "invoice",
+            "ref_id": 501,
+            "amount": 840.0,
+            "account": "checking",
+            "paid_at": "2026-08-31",
+            "approved_by": "Ian"
+          },
+          {
+            "id": 2,
+            "kind": "lease",
+            "ref_id": 1,
+            "amount": 2400.0,
+            "account": "checking",
+            "paid_at": "2026-08-31",
+            "approved_by": "Ian"
+          }
+        ]
+      },
+      "verified_all_fields_against_working_db": true
     },
     {
-      "prompt": "Read the factual context for open ticket 102, including relevant shop records.",
+      "prompt": "Read the current factual records for ticket 102.",
       "tool_name": "get_ticket_102_rent_and_cash_context",
+      "arguments": {},
       "returned_output": {
-        "ticket": {"id": 102, "type": "rent_notice", "requester": "Elm City Properties", "subject": "Rent due", "sku": null, "size": null, "qty": null, "lease_id": 1, "invoice_id": null, "status": "open", "notes": "Email: shop rent due in 2 days.", "created_at": "2026-08-31T11:05:00-04:00"},
-        "lease": {"id": 1, "space_name": "Chapel Street shop", "landlord": "Elm City Properties", "monthly_rent": 2400.0, "next_due": "2026-09-02", "notes": null},
-        "checking": {"name": "checking", "balance": 3400.0, "date": "2026-08-31"},
+        "ticket": {
+          "id": 102,
+          "type": "rent_notice",
+          "requester": "Elm City Properties",
+          "subject": "Rent due",
+          "sku": null,
+          "size": null,
+          "qty": null,
+          "lease_id": 1,
+          "invoice_id": null,
+          "status": "resolved",
+          "notes": "Email: shop rent due in 2 days.",
+          "created_at": "2026-08-31T11:05:00-04:00"
+        },
+        "lease": {
+          "id": 1,
+          "space_name": "Chapel Street shop",
+          "landlord": "Elm City Properties",
+          "monthly_rent": 2400.0,
+          "next_due": "2026-09-02",
+          "notes": null
+        },
+        "checking": {
+          "name": "checking",
+          "balance": 160.0,
+          "date": "2026-08-31"
+        },
         "desk_date_today": "2026-08-31",
-        "payment_ledger": []
-      }
+        "payment_ledger": [
+          {
+            "id": 1,
+            "kind": "invoice",
+            "ref_id": 501,
+            "amount": 840.0,
+            "account": "checking",
+            "paid_at": "2026-08-31",
+            "approved_by": "Ian"
+          },
+          {
+            "id": 2,
+            "kind": "lease",
+            "ref_id": 1,
+            "amount": 2400.0,
+            "account": "checking",
+            "paid_at": "2026-08-31",
+            "approved_by": "Ian"
+          }
+        ]
+      },
+      "verified_all_fields_against_working_db": true
     },
     {
-      "prompt": "Read the factual context for open ticket 103, including relevant shop records.",
+      "prompt": "Read the current factual records for ticket 103.",
       "tool_name": "get_ticket_103_hoodie_stock_and_pricing",
+      "arguments": {},
       "returned_output": {
-        "ticket": {"id": 103, "type": "price_override", "requester": "Yale AI Club", "subject": "Bulk hoodie discount", "sku": "CC-HOOD-NAVY", "size": "M", "qty": 20, "lease_id": null, "invoice_id": null, "status": "open", "notes": "Student org wants 20 hoodies, size M, asking for a bulk discount.", "created_at": "2026-08-31T16:55:00-04:00"},
+        "ticket": {
+          "id": 103,
+          "type": "price_override",
+          "requester": "Yale AI Club",
+          "subject": "Bulk hoodie discount",
+          "sku": "CC-HOOD-NAVY",
+          "size": "M",
+          "qty": 20,
+          "lease_id": null,
+          "invoice_id": null,
+          "status": "resolved",
+          "notes": "Student org wants 20 hoodies, size M, asking for a bulk discount.",
+          "created_at": "2026-08-31T16:55:00-04:00"
+        },
         "inventory_by_size": [
-          {"sku": "CC-HOOD-NAVY", "name": "Basic Hoodie Big Yale", "size": "L", "qty": 14, "location": "Aisle A"},
-          {"sku": "CC-HOOD-NAVY", "name": "Basic Hoodie Big Yale", "size": "M", "qty": 8, "location": "Aisle A"},
-          {"sku": "CC-HOOD-NAVY", "name": "Basic Hoodie Big Yale", "size": "S", "qty": 4, "location": "Aisle A"},
-          {"sku": "CC-HOOD-NAVY", "name": "Basic Hoodie Big Yale", "size": "XL", "qty": 6, "location": "Aisle A"}
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "L",
+            "qty": 14,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "M",
+            "qty": 8,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "S",
+            "qty": 4,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "XL",
+            "qty": 6,
+            "location": "Aisle A"
+          }
         ],
-        "pricing": {"sku": "CC-HOOD-NAVY", "unit_cost": 22.0, "list_price": 58.0}
-      }
+        "pricing": {
+          "sku": "CC-HOOD-NAVY",
+          "unit_cost": 22.0,
+          "list_price": 58.0
+        }
+      },
+      "verified_all_fields_against_working_db": true
     }
   ]
 }

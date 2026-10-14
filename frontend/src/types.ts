@@ -71,6 +71,9 @@ export interface Approval {
       balance_after_payment?: number
       desk_date_today?: string
       can_pay_if_human_approved?: boolean
+      can_finalize_if_human_approved?: boolean
+      summary?: string
+      draft?: string
       blocked_reason?: string | null
     }
     [key: string]: unknown
@@ -81,4 +84,5 @@ export interface CashAccount {
   name: string
   balance: number
   date: string
+  desk_date_today: string
 }

@@ -39,6 +39,12 @@ function App() {
 
   const selected = tickets.find(ticket => ticket.id === selectedId) ?? null
   const selectedEvents = useMemo(() => events.filter(event => event.ticket_id === selectedId), [events, selectedId])
+  const savedOutcome = [...selectedEvents].reverse().find(event =>
+    event.event_type === 'ticket_run_stopped' && event.details.outcome)?.details.outcome as TicketOutcome | undefined
+  const visibleOutcome = outcome?.ticket_id === selectedId ? outcome : savedOutcome
+  const lastBossReport = [...selectedEvents].reverse().find(event =>
+    event.agent === 'Boss' && event.event_type === 'agent_completed')
+  const finalResolution = [...selectedEvents].reverse().find(event => event.event_type === 'ticket_resolved')
   const runIsActive = runningTicket === selectedId
 
   const refresh = useCallback(async (quiet = false) => {
@@ -144,7 +150,7 @@ function App() {
         </a>
         <div className="topbar-center"><span className="workspace-dot" /> OPERATIONS / LIVE WORKSPACE</div>
         <div className="topbar-right">
-          <span className={`connection ${error ? 'has-error' : ''}`}><span className="connection-dot" />{error ? 'API issue' : 'Connected'}</span>
+          <span className={`connection ${error ? 'has-error' : ''}`}><span className="connection-dot" />{error ? 'Needs attention' : loading ? 'Connecting' : 'Connected'}</span>
           <button className="icon-button" type="button" onClick={() => void refresh()} aria-label="Refresh dashboard" title="Refresh">
             <RefreshCw size={15} className={refreshing ? 'spin' : ''} />
           </button>
@@ -160,7 +166,7 @@ function App() {
             <p className="page-subtitle">One place to supervise decisions, evidence, and the people behind them.</p>
           </div>
           <div className="heading-meta">
-            <div className="date-stamp"><span className="meta-label">DESK DATE</span><span className="meta-value">{cash?.date ?? '—'}</span></div>
+            <div className="date-stamp"><span className="meta-label">DESK DATE</span><span className="meta-value">{cash?.desk_date_today ?? '—'}</span></div>
             <div className="meta-divider" />
             <div className="date-stamp"><span className="meta-label">LAST SYNC</span><span className="meta-value">{lastUpdated ? timeLabel(lastUpdated.toISOString()) : '—'}</span></div>
           </div>
@@ -214,7 +220,9 @@ function App() {
 
               <div className="selected-note"><FileClock size={14} /><span>{selected.notes || 'No additional ticket note.'}</span><span className="created-at">Opened {new Date(selected.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span></div>
 
-              {outcome?.ticket_id === selectedId && <OutcomeCard outcome={outcome} />}
+              {selected.status.toLowerCase() === 'resolved' && finalResolution && <section className="outcome-card"><div className="outcome-content"><div className="outcome-head"><span>VERIFIED FINAL DISPOSITION</span><span className="outcome-status">Resolved in database</span></div><p>{finalResolution.summary}</p>{selected.id !== 102 && <p>Internal handling only. No shipment, accepted order, or customer contact is confirmed.</p>}</div></section>}
+              {visibleOutcome && <OutcomeCard outcome={visibleOutcome} />}
+              {!visibleOutcome && lastBossReport && <section className="outcome-card"><div className="outcome-content"><div className="outcome-head"><span>LAST AGENT REVIEW</span><span className="outcome-status">Before subsequent actions</span></div><p>{lastBossReport.summary}</p></div></section>}
 
               <section className="activity-section">
                 <div className="activity-heading"><div><span className="section-kicker">OBSERVABILITY</span><h3>Activity stream</h3></div><div className="activity-tools"><span className="auto-refresh"><span /> AUTO-REFRESH · 4S</span><span className="event-count">{selectedEvents.length} events</span></div></div>
@@ -269,7 +277,7 @@ function OutcomeCard({ outcome }: { outcome: TicketOutcome }) {
   const label = outcome.status.replaceAll('_', ' ')
   return <section className={`outcome-card outcome-${outcome.status}`}>
     <div className="outcome-icon">{outcome.status === 'blocked' ? <TriangleAlert size={17} /> : outcome.status === 'needs_approval' ? <Pause size={17} /> : <Sparkles size={17} />}</div>
-    <div className="outcome-content"><div className="outcome-head"><span>RUN SUMMARY</span><span className="outcome-status">{label}</span></div><p>{outcome.summary}</p><div className="outcome-meta"><span>{outcome.agent_invocations} agent steps</span><span>{outcome.delegation_count} handoffs</span><span>{outcome.mcp_calls} MCP calls</span></div></div>
+    <div className="outcome-content"><div className="outcome-head"><span>AGENT REVIEW SNAPSHOT</span><span className="outcome-status">{label} · before subsequent actions</span></div><p>{outcome.summary}</p><div className="outcome-meta"><span>{outcome.agent_invocations} agent steps</span><span>{outcome.delegation_count} handoffs</span><span>{outcome.mcp_calls} MCP calls</span></div>{outcome.drafts.map((draft, index) => <details key={index}><summary>Internal draft {index + 1} · not sent</summary><p>{draft}</p></details>)}</div>
   </section>
 }
 
@@ -278,16 +286,17 @@ function ApprovalCard({ approval, busy, canApprove, onDecision }: { approval: Ap
   const quote = approval.details?.authoritative_quote ?? {}
   const amount = request.amount ?? quote.amount
   const kind = request.payment_kind ?? 'purchase'
-  const supportedPayment = kind === 'invoice' || kind === 'lease'
-  const item = quote.description ?? (kind === 'invoice' ? `Invoice ${request.reference_id ?? ''}` : kind === 'lease' ? `Lease ${request.reference_id ?? ''} rent` : `Purchase ${request.reference_id ?? ''}`)
+  const resolution = kind === 'ticket_resolution'
+  const supportedPayment = resolution || kind === 'invoice' || kind === 'lease'
+  const item = quote.description ?? (resolution ? 'Internal case disposition' : kind === 'invoice' ? `Invoice ${request.reference_id ?? ''}` : kind === 'lease' ? `Lease ${request.reference_id ?? ''} rent` : `Purchase ${request.reference_id ?? ''}`)
   const remaining = quote.balance_after_payment
   return <article className="approval-card">
     <div className="approval-card-top"><span className="approval-type"><span className="approval-type-dot" />{kind} request</span><span className="approval-ticket">T{approval.ticket_id ?? '—'}</span></div>
     <h3>{item}</h3>
     <p className="approval-rationale">{request.rationale ?? approval.summary}</p>
-    <div className="money-impact"><div><span>REQUESTED</span><strong>{typeof amount === 'number' ? dollars(amount) : 'Amount pending'}</strong></div><ArrowDownRight size={15} /><div><span>AFTER PAYMENT</span><strong>{typeof remaining === 'number' ? dollars(remaining) : 'Rechecked on approval'}</strong></div></div>
+    {resolution ? <><p className="approval-rationale">{quote.summary} No cash moves. This does not confirm shipment or accept an order.</p><details><summary>Review exact unsent draft</summary><p>{quote.draft}</p></details></> : <div className="money-impact"><div><span>REQUESTED</span><strong>{typeof amount === 'number' ? dollars(amount) : 'Amount pending'}</strong></div><ArrowDownRight size={15} /><div><span>AFTER PAYMENT</span><strong>{typeof remaining === 'number' ? dollars(remaining) : 'Rechecked on approval'}</strong></div></div>}
     <div className="approval-evidence"><span className="evidence-check"><Check size={11} /></span><span>{quote.can_pay_if_human_approved === false ? quote.blocked_reason ?? 'Current payment quote is blocked.' : 'Database quote attached · balance will be checked again.'}</span></div>
-    <div className="approval-actions"><button className="decline-button" disabled={busy || !canApprove} onClick={() => onDecision('reject')} type="button">Decline</button><button className="approve-button" disabled={busy || !canApprove || !supportedPayment || quote.can_pay_if_human_approved === false} onClick={() => onDecision('approve')} type="button">{busy ? <LoaderCircle size={14} className="spin" /> : <BadgeCheck size={15} />} Approve</button></div>
+    <div className="approval-actions"><button className="decline-button" disabled={busy || !canApprove} onClick={() => onDecision('reject')} type="button">Decline</button><button className="approve-button" disabled={busy || !canApprove || !supportedPayment || quote.can_pay_if_human_approved === false || quote.can_finalize_if_human_approved === false} onClick={() => onDecision('approve')} type="button">{busy ? <LoaderCircle size={14} className="spin" /> : <BadgeCheck size={15} />} {resolution ? 'Approve resolution' : 'Approve'}</button></div>
     {!canApprove && <span className="approval-hint">Add your name above to enable review.</span>}
     {canApprove && !supportedPayment && <span className="approval-hint">Purchase execution is not supported by the current API.</span>}
   </article>

@@ -12,6 +12,10 @@ Payment proposals include the quoted amount, expected post-payment balance when 
 
 The current API/database implementation supports executable invoice and lease payments. A future purchase proposal can be shown in the approval lane, but its Approve action stays disabled until a purchase-order operation exists; the UI will not pretend the present payment endpoint can place or pay for an order.
 
+The final workflow also supports human-approved internal case dispositions. Those cards show the exact unsent draft and explicitly say that no money moves, shipment is confirmed, or order is accepted. A separate verified-final-disposition card appears only after the database status is resolved, above the historical agent review. This avoids showing an old “needs approval” review as if it were the current case status.
+
 Small intentional details include a timestamp for the last successful sync, a 4-second activity heartbeat, a date tied to the desk/database, ticket indexing, “drafts stay internal” language, and reduced-motion support. Loading, no-activity, no-approval, disconnected, processing, completed, and error states are all designed into the same visual system. The layout collapses into a ticket strip and stacked approval lane on smaller screens while keeping the work stream central.
 
 The frontend is local React + Vite + TypeScript and calls only the FastAPI routes on `http://localhost:8000`. It uses no remote images or UI service; the icon set is bundled with the app.
+
+The final audit corrected the initial connection label to say “Connecting,” separated the shop date from the cash account's last transaction date, and restored historical agent reviews after reload. Reviews are explicitly labeled as preceding later actions; current ticket status and current checking remain separate. New run outcomes persist internal drafts and expose them in collapsible sections. The current-generation event feed excludes pre-reset actions while the API retains access to the complete audit history. Real desktop captures, a 390px no-overflow check, and a reload check are recorded in `dashboard_browser_check.json`.

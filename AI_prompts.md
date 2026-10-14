@@ -6,6 +6,8 @@ This file records the prompts and follow-ups used for each numbered HW5 problem.
 
 **Prompt:**
 
+The original setup also specified the FastMCP server, a FastAPI/PydanticAI five-agent team, and a React/Vite/TypeScript dashboard; an immutable original DB and separate working copy; only gpt-6-Luna through Portkey; private API keys; DB-backed shop facts; explicit human approval and nonnegative outgoing cash; vendor-table lead times and unpaid-invoice shipping blocks; drafts only; desk.date_today; append-only audit; a clean reset before the final run; one numbered problem at a time; exact file locations; restrained, polished design; and a prompt log with truthful follow-ups. This paragraph summarizes that setup; the final instruction below is quoted verbatim.
+
 > For now, only inspect the workspace, create AI_prompts.md if it does not exist, and tell me you are ready for Problem 2. Do not start later problems yet.
 
 **Follow-up:** None.
@@ -422,3 +424,29 @@ The missing element after the initial run was explicit human authorization and a
 > Ian
 
 The first audit was missing the target repository and explicit payment decisions; both payments are now recorded, but the tickets still lack legitimate final dispositions and screenshot evidence. The conservative disposition is to keep 101 and 103 open rather than fabricate fulfillment or a customer decision.
+
+### Problem 11 follow-up — repeat the complete pre-submission audit
+
+**Prompt:**
+
+> do this again
+
+The attached full request is preserved verbatim in [output/pre_submission_request.txt](output/pre_submission_request.txt). It asks for a strict Problems 1–11 audit, fixes for actual defects, safe runtime tests, truthful evidence, and no GitHub push during this audit.
+
+**What was missing after the previous attempt:** The earlier pass lacked regression coverage for reset/payment races and stale approvals, current-state MCP smoke results, and real dashboard screenshots; two unresolved ticket workflows still prevent a completed three-ticket submission.
+
+### Problem 11 follow-up — complete compliance and final run
+
+**Prompt:**
+
+> okay go ahead and make it fully compliant please. take as much time as you need
+
+**What was missing:** Tickets 101 and 103 lacked human-reviewable internal dispositions, the clean completed run and matching evidence had not been produced, and the Codex project connection and publication remained unverified.
+
+**Human approval requested:** For the clean final run, authorize invoice 501 ($840), lease 1 rent ($2,400), ticket 101's internal backorder plan after payment (no shipment/delivery promise), and ticket 103's declined 20-medium-hoodie/discount request with an unsent availability draft (8 in stock, $58 list price, no accepted order or cash change), under Ian; checking goes from $3,400 to $160.
+
+**User response:**
+
+> Approve all four under Ian
+
+The approval applies to these four specified actions, not unrelated purchases or payments. Internal resolution does not mean physical fulfillment or customer acceptance.

@@ -37,19 +37,21 @@ class AuditTrail:
         return result
 
     def pending_approval(self, approval_id: str) -> dict[str, Any] | None:
-        pending: dict[str, Any] | None = None
-        for event in self.events():
-            if event.get("approval_id") != approval_id:
-                continue
-            if event.get("event_type") == "approval_requested":
-                pending = event
-            elif event.get("event_type") in {"approval_decision", "payment_executed", "payment_blocked"}:
-                pending = None
-        return pending
+        return next((event for event in self.pending_approvals()
+                     if event.get("approval_id") == approval_id), None)
+
+    def current_events(self) -> list[dict[str, Any]]:
+        """Current database generation; previous generations remain in the journal."""
+        events = self.events()
+        start = 0
+        for index, event in enumerate(events):
+            if event.get("event_type") == "working_database_reset":
+                start = index + 1
+        return events[start:]
 
     def pending_approvals(self) -> list[dict[str, Any]]:
         outstanding: dict[str, dict[str, Any]] = {}
-        for event in self.events():
+        for event in self.current_events():
             approval_id = event.get("approval_id")
             if not approval_id:
                 continue

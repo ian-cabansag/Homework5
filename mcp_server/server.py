@@ -7,6 +7,9 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 import shutil
+import math
+import json
+import hashlib
 from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
@@ -41,6 +44,8 @@ def get_checking_balance() -> dict[str, Any]:
             "SELECT name, balance, date FROM cash_accounts WHERE name = ?",
             ("checking",),
         )
+        desk = _one(connection, "SELECT date_today FROM desk LIMIT 1", ())
+        account["desk_date_today"] = desk["date_today"]
     return {"account": account}
 
 
@@ -263,6 +268,10 @@ def _payment_quote(
         description = f"Lease {ref_id} rent"
 
     balance = float(checking["balance"])
+    if not math.isfinite(amount) or not math.isfinite(balance):
+        raise ValueError("Financial records must contain finite amounts.")
+    if amount != round(amount, 2) or balance != round(balance, 2):
+        raise ValueError("Financial records must use whole cents.")
     can_pay = not already_paid and amount > 0 and amount <= balance
     if already_paid:
         reason = "The invoice is not open or this lease already has a payment record."
@@ -302,6 +311,7 @@ def execute_approved_payment(
     approved_by: Annotated[str, Field(min_length=1, max_length=120)],
     approval_id: Annotated[str, Field(min_length=1, max_length=100)],
     approval_token: Annotated[str, Field(min_length=32, max_length=200)],
+    approved_amount: Annotated[float, Field(gt=0, allow_inf_nan=False)],
 ) -> dict[str, Any]:
     """Execute an explicitly approved outgoing payment; a linked paid rent notice is resolved atomically."""
     approved_by = approved_by.strip()
@@ -316,6 +326,8 @@ def execute_approved_payment(
         quote = _payment_quote(connection, kind, ref_id)
         if not quote["can_pay_if_human_approved"]:
             raise ValueError(quote["blocked_reason"] or "Payment is not eligible.")
+        if approved_amount != quote["amount"]:
+            raise ValueError("The obligation amount changed; a new human review is required.")
 
         amount = float(quote["amount"])
         date_today = str(quote["desk_date_today"])
@@ -410,6 +422,96 @@ def resolve_paid_rent_notice() -> dict[str, Any]:
         "approved_by": payment["approved_by"],
         "external_contact_made": False,
     }
+
+
+def _resolution_quote(connection: sqlite3.Connection, ticket_id: int) -> dict[str, Any]:
+    ticket = _one(connection, "SELECT * FROM tickets WHERE id = ?", (ticket_id,))
+    stock = _one(connection, "SELECT * FROM inventory WHERE sku = ? AND size = ?", (ticket["sku"], ticket["size"]))
+    price = _one(connection, "SELECT * FROM pricing WHERE sku = ?", (ticket["sku"],))
+    today = _one(connection, "SELECT date_today FROM desk LIMIT 1", ())["date_today"]
+    facts: dict[str, Any] = {"ticket": ticket, "inventory": stock, "pricing": price, "desk_date_today": today}
+    reason = None
+    if ticket_id == 101:
+        invoice = _one(connection, "SELECT * FROM invoices WHERE id = ?", (ticket["invoice_id"],))
+        vendor = _one(connection, "SELECT * FROM vendors WHERE id = ?", (invoice["vendor_id"],))
+        unpaid = _many(connection, "SELECT id FROM invoices WHERE vendor_id = ? AND lower(status) != 'paid'", (vendor["id"],))
+        payment = connection.execute("SELECT * FROM payments WHERE kind='invoice' AND ref_id=? AND amount=? AND length(trim(approved_by))>0", (invoice["id"], invoice["amount"])).fetchone()
+        facts.update(invoice=invoice, vendor=vendor, unpaid_invoices=unpaid)
+        if unpaid or payment is None:
+            reason = "Pay the linked invoice with human approval before closing the backorder review."
+        disposition = "backorder_plan_approved"
+        summary = "Internal backorder review completed; fulfillment remains unconfirmed."
+        draft = (f"Regarding your request for {ticket['qty']} {stock['name']}, size {ticket['size']}: "
+                 f"our recorded stock is {stock['qty']}. The linked reprint vendor is {vendor['name']}, "
+                 f"with a recorded lead time of {vendor['lead_days']} days. "
+                 "That lead time is not a delivery commitment. We cannot confirm shipment or a pickup date. "
+                 "This internal response and backorder plan require operator review; no vendor order or shipment is being claimed.")
+    elif ticket_id == 103:
+        disposition = "bulk_request_declined"
+        summary = "Requested bulk quantity/discount declined internally; alternative availability drafted without accepting an order."
+        draft = (f"Regarding your request for {ticket['qty']} {stock['name']}, size {ticket['size']}: "
+                 f"our recorded stock is {stock['qty']}, so we cannot fulfill the requested quantity from current stock. "
+                 f"We are not approving a bulk discount. The recorded list price is ${price['list_price']:.2f} per unit. "
+                 "An availability alternative can be discussed, but no units are reserved and no order is accepted. "
+                 "This response is an internal, unsent draft.")
+    else:
+        raise ValueError("This operation handles only tickets 101 and 103.")
+    if stock["qty"] >= ticket["qty"]:
+        reason = "Stock no longer supports this shortage disposition; review the ticket again."
+    if ticket["status"].lower() != "open":
+        reason = "The ticket is no longer open."
+    quote = {"ticket_id": ticket_id, "disposition": disposition, "summary": summary, "draft": draft,
+             "facts": facts, "amount": 0.0, "cash_change": 0.0,
+             "resolution_scope": "internal_ticket_handling_only", "external_contact_made": False,
+             "fulfillment_confirmed": False, "order_accepted": False, "discount_authorized": False,
+             "can_finalize_if_human_approved": reason is None, "blocked_reason": reason}
+    quote["fingerprint"] = hashlib.sha256(json.dumps(quote, sort_keys=True).encode()).hexdigest()
+    return quote
+
+
+@mcp.tool()
+def get_ticket_resolution_quote(ticket_id: Literal[101, 103]) -> dict[str, Any]:
+    """Prepare an exact DB-grounded internal disposition and unsent draft for human review; no writes."""
+    with closing(_connect_readonly()) as connection:
+        return _resolution_quote(connection, ticket_id)
+
+
+@mcp.tool()
+def execute_approved_ticket_resolution(
+    ticket_id: Literal[101, 103],
+    approved_by: Annotated[str, Field(min_length=1, max_length=120)],
+    approval_id: Annotated[str, Field(min_length=1, max_length=100)],
+    quote_fingerprint: Annotated[str, Field(min_length=64, max_length=64)],
+    approval_token: Annotated[str, Field(min_length=32, max_length=200)],
+) -> dict[str, Any]:
+    """Record a human-approved internal case disposition; never claim physical fulfillment or move money."""
+    expected = os.environ.pop("CAMPUS_CUSTOMS_APPROVAL_TOKEN", "")
+    if not approved_by.strip() or not expected or not hmac.compare_digest(expected, approval_token):
+        raise PermissionError("An explicit human approval is required.")
+    with closing(_connect_write()) as connection:
+        connection.execute("BEGIN IMMEDIATE")
+        quote = _resolution_quote(connection, ticket_id)
+        if not quote["can_finalize_if_human_approved"]:
+            raise ValueError(quote["blocked_reason"])
+        if not hmac.compare_digest(quote["fingerprint"], quote_fingerprint):
+            raise ValueError("Evidence changed; prepare a new human review.")
+        connection.execute("CREATE TABLE IF NOT EXISTS ticket_resolutions (ticket_id INTEGER PRIMARY KEY REFERENCES tickets(id), disposition TEXT NOT NULL, summary TEXT NOT NULL, draft TEXT NOT NULL, evidence_json TEXT NOT NULL, approved_by TEXT NOT NULL, approval_id TEXT NOT NULL UNIQUE, resolved_on TEXT NOT NULL)")
+        connection.execute("CREATE TRIGGER IF NOT EXISTS resolutions_no_update BEFORE UPDATE ON ticket_resolutions BEGIN SELECT RAISE(ABORT, 'Resolution history is append-only'); END")
+        connection.execute("CREATE TRIGGER IF NOT EXISTS resolutions_no_delete BEFORE DELETE ON ticket_resolutions BEGIN SELECT RAISE(ABORT, 'Resolution history is append-only'); END")
+        connection.execute("INSERT INTO ticket_resolutions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                           (ticket_id, quote["disposition"], quote["summary"], quote["draft"], json.dumps(quote, sort_keys=True), approved_by.strip(), approval_id, quote["facts"]["desk_date_today"]))
+        connection.execute("UPDATE tickets SET status='resolved' WHERE id=?", (ticket_id,))
+        connection.commit()
+    return {**quote, "status": "resolved", "approved_by": approved_by.strip(), "approval_id": approval_id, "cash_changed": False}
+
+
+@mcp.tool()
+def get_ticket_resolution_record(ticket_id: Literal[101, 103]) -> dict[str, Any]:
+    """Read a stored internal resolution, including its exact unsent draft and human approval."""
+    with closing(_connect_readonly()) as connection:
+        exists = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ticket_resolutions'").fetchone()
+        row = connection.execute("SELECT * FROM ticket_resolutions WHERE ticket_id=?", (ticket_id,)).fetchone() if exists else None
+    return {"resolution": dict(row) if row is not None else None}
 
 
 if __name__ == "__main__":

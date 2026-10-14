@@ -7,7 +7,9 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
-.codex/
+.audit-tools/
+.codex/*
+!.codex/config.toml
 frontend/node_modules/
 frontend/dist/
 frontend/tsconfig.tsbuildinfo

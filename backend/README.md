@@ -17,6 +17,8 @@ The API provides `POST /tickets/{ticket_id}/run` for one ticket ID (101, 102, or
 
 Interactive API documentation is available at `/docs` while the local service is running.
 
+Internal dispositions for tickets 101/103 use the same human decision route. MCP binds execution to the reviewed evidence fingerprint, appends the exact unsent draft and disposition, and changes only ticket status/history. It returns `cash_changed:false`. Ticket 101 requires its linked invoice payment and no unpaid vendor invoices. These dispositions do not claim shipment or an accepted order. Use one backend process; never run the offline supervisor concurrently with it.
+
 ## Agent roles and operating limits
 
 Detailed role instructions live in `prompts/`. Boss coordinates and synthesizes; Inventory handles stock and replenishment constraints; Accounting handles invoices, cash, and approval requests; Facilities handles lease notices; Customer Service writes internal drafts. Agents can delegate with a specific reason and task. Runtime guards stop role cycles, cap the delegation depth at two and total delegations at three, and cap a ticket run at five agent invocations and twelve MCP calls. Each PydanticAI invocation is separately capped at four model requests, six tool calls, and 8,000 tokens.

@@ -1,0 +1,1443 @@
+{
+  "campus_customs.db": {
+    "sha256": "23686a90d698f7fa6f901a3f0a9774db9cbb31e13151c9e5717275f3321f360a",
+    "integrity_check": "ok",
+    "foreign_key_check": [],
+    "tables": {
+      "cash_accounts": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "balance",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "date",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "name": "checking",
+            "balance": 3400.0,
+            "date": "2026-08-31"
+          }
+        ]
+      },
+      "desk": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "date_today",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "notes",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "date_today": "2026-08-31",
+            "notes": null
+          }
+        ]
+      },
+      "inventory": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "sku",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "size",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 2
+          },
+          {
+            "cid": 3,
+            "name": "qty",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "location",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "S",
+            "qty": 4,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "M",
+            "qty": 8,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "L",
+            "qty": 14,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "XL",
+            "qty": 6,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "S",
+            "qty": 0,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "M",
+            "qty": 5,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "L",
+            "qty": 3,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "XL",
+            "qty": 2,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-HAT-BLUE",
+            "name": "Yale Cap",
+            "size": "OS",
+            "qty": 40,
+            "location": "Aisle C"
+          },
+          {
+            "sku": "CC-MUG-CREST",
+            "name": "Crest Mug",
+            "size": "OS",
+            "qty": 0,
+            "location": "Aisle D"
+          }
+        ]
+      },
+      "invoices": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "vendor_id",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "amount",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "due_date",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "description",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [
+          {
+            "id": 0,
+            "seq": 0,
+            "table": "vendors",
+            "from": "vendor_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          }
+        ],
+        "rows": [
+          {
+            "id": 501,
+            "vendor_id": 1,
+            "amount": 840.0,
+            "due_date": "2026-08-28",
+            "status": "open",
+            "description": "Rush reprint CC-TEE-WHITE S"
+          }
+        ]
+      },
+      "leases": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "space_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "landlord",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "monthly_rent",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "next_due",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "notes",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "id": 1,
+            "space_name": "Chapel Street shop",
+            "landlord": "Elm City Properties",
+            "monthly_rent": 2400.0,
+            "next_due": "2026-09-02",
+            "notes": null
+          }
+        ]
+      },
+      "payments": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "kind",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "ref_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "amount",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "account",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "paid_at",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "approved_by",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": []
+      },
+      "pricing": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "sku",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "unit_cost",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "list_price",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "sku": "CC-HOOD-NAVY",
+            "unit_cost": 22.0,
+            "list_price": 58.0
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "unit_cost": 8.0,
+            "list_price": 28.0
+          },
+          {
+            "sku": "CC-HAT-BLUE",
+            "unit_cost": 6.0,
+            "list_price": 22.0
+          },
+          {
+            "sku": "CC-MUG-CREST",
+            "unit_cost": 3.5,
+            "list_price": 14.0
+          }
+        ]
+      },
+      "tickets": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "requester",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "subject",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "sku",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "size",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "qty",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "lease_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "invoice_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "notes",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "created_at",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [
+          {
+            "id": 0,
+            "seq": 0,
+            "table": "invoices",
+            "from": "invoice_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          },
+          {
+            "id": 1,
+            "seq": 0,
+            "table": "leases",
+            "from": "lease_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          }
+        ],
+        "rows": [
+          {
+            "id": 101,
+            "type": "customer_order",
+            "requester": "Tauhid Zaman",
+            "subject": "Bulldog tee",
+            "sku": "CC-TEE-WHITE",
+            "size": "S",
+            "qty": 1,
+            "lease_id": null,
+            "invoice_id": 501,
+            "status": "open",
+            "notes": "Needs a tee in size S.",
+            "created_at": "2026-08-31T09:15:00-04:00"
+          },
+          {
+            "id": 102,
+            "type": "rent_notice",
+            "requester": "Elm City Properties",
+            "subject": "Rent due",
+            "sku": null,
+            "size": null,
+            "qty": null,
+            "lease_id": 1,
+            "invoice_id": null,
+            "status": "open",
+            "notes": "Email: shop rent due in 2 days.",
+            "created_at": "2026-08-31T11:05:00-04:00"
+          },
+          {
+            "id": 103,
+            "type": "price_override",
+            "requester": "Yale AI Club",
+            "subject": "Bulk hoodie discount",
+            "sku": "CC-HOOD-NAVY",
+            "size": "M",
+            "qty": 20,
+            "lease_id": null,
+            "invoice_id": null,
+            "status": "open",
+            "notes": "Student org wants 20 hoodies, size M, asking for a bulk discount.",
+            "created_at": "2026-08-31T16:55:00-04:00"
+          }
+        ]
+      },
+      "vendors": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "specialty",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "lead_days",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "id": 1,
+            "name": "Bulldog Print Co",
+            "specialty": "apparel reprint",
+            "lead_days": 5
+          },
+          {
+            "id": 2,
+            "name": "Elm City Gifts",
+            "specialty": "mugs and small goods",
+            "lead_days": 3
+          },
+          {
+            "id": 3,
+            "name": "QuickShip CT",
+            "specialty": "local courier",
+            "lead_days": 1
+          }
+        ]
+      }
+    }
+  },
+  "campus_customs_new.db": {
+    "sha256": "1b556fa73db1a753ef446f9188a33a11b71c71200cf0720ca736aef02c078bac",
+    "integrity_check": "ok",
+    "foreign_key_check": [],
+    "tables": {
+      "cash_accounts": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "balance",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "date",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "name": "checking",
+            "balance": 160.0,
+            "date": "2026-08-31"
+          }
+        ]
+      },
+      "desk": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "date_today",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 1,
+            "name": "notes",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "date_today": "2026-08-31",
+            "notes": null
+          }
+        ]
+      },
+      "inventory": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "sku",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "size",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 2
+          },
+          {
+            "cid": 3,
+            "name": "qty",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "location",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "S",
+            "qty": 4,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "M",
+            "qty": 8,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "L",
+            "qty": 14,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "size": "XL",
+            "qty": 6,
+            "location": "Aisle A"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "S",
+            "qty": 0,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "M",
+            "qty": 5,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "L",
+            "qty": 3,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "XL",
+            "qty": 2,
+            "location": "Aisle B"
+          },
+          {
+            "sku": "CC-HAT-BLUE",
+            "name": "Yale Cap",
+            "size": "OS",
+            "qty": 40,
+            "location": "Aisle C"
+          },
+          {
+            "sku": "CC-MUG-CREST",
+            "name": "Crest Mug",
+            "size": "OS",
+            "qty": 0,
+            "location": "Aisle D"
+          }
+        ]
+      },
+      "invoices": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "vendor_id",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "amount",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "due_date",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "description",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [
+          {
+            "id": 0,
+            "seq": 0,
+            "table": "vendors",
+            "from": "vendor_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          }
+        ],
+        "rows": [
+          {
+            "id": 501,
+            "vendor_id": 1,
+            "amount": 840.0,
+            "due_date": "2026-08-28",
+            "status": "paid",
+            "description": "Rush reprint CC-TEE-WHITE S"
+          }
+        ]
+      },
+      "leases": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "space_name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "landlord",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "monthly_rent",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "next_due",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "notes",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "id": 1,
+            "space_name": "Chapel Street shop",
+            "landlord": "Elm City Properties",
+            "monthly_rent": 2400.0,
+            "next_due": "2026-09-02",
+            "notes": null
+          }
+        ]
+      },
+      "payments": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "kind",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "ref_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "amount",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "account",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "paid_at",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "approved_by",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "id": 1,
+            "kind": "invoice",
+            "ref_id": 501,
+            "amount": 840.0,
+            "account": "checking",
+            "paid_at": "2026-08-31",
+            "approved_by": "Ian"
+          },
+          {
+            "id": 2,
+            "kind": "lease",
+            "ref_id": 1,
+            "amount": 2400.0,
+            "account": "checking",
+            "paid_at": "2026-08-31",
+            "approved_by": "Ian"
+          }
+        ]
+      },
+      "pricing": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "sku",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "unit_cost",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "list_price",
+            "type": "REAL",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "sku": "CC-HOOD-NAVY",
+            "unit_cost": 22.0,
+            "list_price": 58.0
+          },
+          {
+            "sku": "CC-TEE-WHITE",
+            "unit_cost": 8.0,
+            "list_price": 28.0
+          },
+          {
+            "sku": "CC-HAT-BLUE",
+            "unit_cost": 6.0,
+            "list_price": 22.0
+          },
+          {
+            "sku": "CC-MUG-CREST",
+            "unit_cost": 3.5,
+            "list_price": 14.0
+          }
+        ]
+      },
+      "ticket_resolutions": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "ticket_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "disposition",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "summary",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "draft",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "evidence_json",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "approved_by",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "approval_id",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "resolved_on",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [
+          {
+            "id": 0,
+            "seq": 0,
+            "table": "tickets",
+            "from": "ticket_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          }
+        ],
+        "rows": [
+          {
+            "ticket_id": 101,
+            "disposition": "backorder_plan_approved",
+            "summary": "Internal backorder review completed; fulfillment remains unconfirmed.",
+            "draft": "Regarding your request for 1 Classic Bulldog Tee, size S: our recorded stock is 0. The linked reprint vendor is Bulldog Print Co, with a recorded lead time of 5 days. That lead time is not a delivery commitment. We cannot confirm shipment or a pickup date. This internal response and backorder plan require operator review; no vendor order or shipment is being claimed.",
+            "evidence_json": "{\"amount\": 0.0, \"blocked_reason\": null, \"can_finalize_if_human_approved\": true, \"cash_change\": 0.0, \"discount_authorized\": false, \"disposition\": \"backorder_plan_approved\", \"draft\": \"Regarding your request for 1 Classic Bulldog Tee, size S: our recorded stock is 0. The linked reprint vendor is Bulldog Print Co, with a recorded lead time of 5 days. That lead time is not a delivery commitment. We cannot confirm shipment or a pickup date. This internal response and backorder plan require operator review; no vendor order or shipment is being claimed.\", \"external_contact_made\": false, \"facts\": {\"desk_date_today\": \"2026-08-31\", \"inventory\": {\"location\": \"Aisle B\", \"name\": \"Classic Bulldog Tee\", \"qty\": 0, \"size\": \"S\", \"sku\": \"CC-TEE-WHITE\"}, \"invoice\": {\"amount\": 840.0, \"description\": \"Rush reprint CC-TEE-WHITE S\", \"due_date\": \"2026-08-28\", \"id\": 501, \"status\": \"paid\", \"vendor_id\": 1}, \"pricing\": {\"list_price\": 28.0, \"sku\": \"CC-TEE-WHITE\", \"unit_cost\": 8.0}, \"ticket\": {\"created_at\": \"2026-08-31T09:15:00-04:00\", \"id\": 101, \"invoice_id\": 501, \"lease_id\": null, \"notes\": \"Needs a tee in size S.\", \"qty\": 1, \"requester\": \"Tauhid Zaman\", \"size\": \"S\", \"sku\": \"CC-TEE-WHITE\", \"status\": \"open\", \"subject\": \"Bulldog tee\", \"type\": \"customer_order\"}, \"unpaid_invoices\": [], \"vendor\": {\"id\": 1, \"lead_days\": 5, \"name\": \"Bulldog Print Co\", \"specialty\": \"apparel reprint\"}}, \"fingerprint\": \"e3fb8e91396145753b7a47b95d620def29e7b19447ad5bbe21e2e8f4769d0eaf\", \"fulfillment_confirmed\": false, \"order_accepted\": false, \"resolution_scope\": \"internal_ticket_handling_only\", \"summary\": \"Internal backorder review completed; fulfillment remains unconfirmed.\", \"ticket_id\": 101}",
+            "approved_by": "Ian",
+            "approval_id": "e4017a95-9398-4df1-9f6e-0ebacbaed9e7",
+            "resolved_on": "2026-08-31"
+          },
+          {
+            "ticket_id": 103,
+            "disposition": "bulk_request_declined",
+            "summary": "Requested bulk quantity/discount declined internally; alternative availability drafted without accepting an order.",
+            "draft": "Regarding your request for 20 Basic Hoodie Big Yale, size M: our recorded stock is 8, so we cannot fulfill the requested quantity from current stock. We are not approving a bulk discount. The recorded list price is $58.00 per unit. An availability alternative can be discussed, but no units are reserved and no order is accepted. This response is an internal, unsent draft.",
+            "evidence_json": "{\"amount\": 0.0, \"blocked_reason\": null, \"can_finalize_if_human_approved\": true, \"cash_change\": 0.0, \"discount_authorized\": false, \"disposition\": \"bulk_request_declined\", \"draft\": \"Regarding your request for 20 Basic Hoodie Big Yale, size M: our recorded stock is 8, so we cannot fulfill the requested quantity from current stock. We are not approving a bulk discount. The recorded list price is $58.00 per unit. An availability alternative can be discussed, but no units are reserved and no order is accepted. This response is an internal, unsent draft.\", \"external_contact_made\": false, \"facts\": {\"desk_date_today\": \"2026-08-31\", \"inventory\": {\"location\": \"Aisle A\", \"name\": \"Basic Hoodie Big Yale\", \"qty\": 8, \"size\": \"M\", \"sku\": \"CC-HOOD-NAVY\"}, \"pricing\": {\"list_price\": 58.0, \"sku\": \"CC-HOOD-NAVY\", \"unit_cost\": 22.0}, \"ticket\": {\"created_at\": \"2026-08-31T16:55:00-04:00\", \"id\": 103, \"invoice_id\": null, \"lease_id\": null, \"notes\": \"Student org wants 20 hoodies, size M, asking for a bulk discount.\", \"qty\": 20, \"requester\": \"Yale AI Club\", \"size\": \"M\", \"sku\": \"CC-HOOD-NAVY\", \"status\": \"open\", \"subject\": \"Bulk hoodie discount\", \"type\": \"price_override\"}}, \"fingerprint\": \"ea719dcc0bae19bf44c95030edcadd4796ee437f9e3fd20a532c0e7844683d17\", \"fulfillment_confirmed\": false, \"order_accepted\": false, \"resolution_scope\": \"internal_ticket_handling_only\", \"summary\": \"Requested bulk quantity/discount declined internally; alternative availability drafted without accepting an order.\", \"ticket_id\": 103}",
+            "approved_by": "Ian",
+            "approval_id": "106e6494-d9df-4f65-b2a8-314c254ccf3b",
+            "resolved_on": "2026-08-31"
+          }
+        ]
+      },
+      "tickets": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "type",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "requester",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "subject",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 4,
+            "name": "sku",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 5,
+            "name": "size",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 6,
+            "name": "qty",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 7,
+            "name": "lease_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 8,
+            "name": "invoice_id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 9,
+            "name": "status",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 10,
+            "name": "notes",
+            "type": "TEXT",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 11,
+            "name": "created_at",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [
+          {
+            "id": 0,
+            "seq": 0,
+            "table": "invoices",
+            "from": "invoice_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          },
+          {
+            "id": 1,
+            "seq": 0,
+            "table": "leases",
+            "from": "lease_id",
+            "to": "id",
+            "on_update": "NO ACTION",
+            "on_delete": "NO ACTION",
+            "match": "NONE"
+          }
+        ],
+        "rows": [
+          {
+            "id": 101,
+            "type": "customer_order",
+            "requester": "Tauhid Zaman",
+            "subject": "Bulldog tee",
+            "sku": "CC-TEE-WHITE",
+            "size": "S",
+            "qty": 1,
+            "lease_id": null,
+            "invoice_id": 501,
+            "status": "resolved",
+            "notes": "Needs a tee in size S.",
+            "created_at": "2026-08-31T09:15:00-04:00"
+          },
+          {
+            "id": 102,
+            "type": "rent_notice",
+            "requester": "Elm City Properties",
+            "subject": "Rent due",
+            "sku": null,
+            "size": null,
+            "qty": null,
+            "lease_id": 1,
+            "invoice_id": null,
+            "status": "resolved",
+            "notes": "Email: shop rent due in 2 days.",
+            "created_at": "2026-08-31T11:05:00-04:00"
+          },
+          {
+            "id": 103,
+            "type": "price_override",
+            "requester": "Yale AI Club",
+            "subject": "Bulk hoodie discount",
+            "sku": "CC-HOOD-NAVY",
+            "size": "M",
+            "qty": 20,
+            "lease_id": null,
+            "invoice_id": null,
+            "status": "resolved",
+            "notes": "Student org wants 20 hoodies, size M, asking for a bulk discount.",
+            "created_at": "2026-08-31T16:55:00-04:00"
+          }
+        ]
+      },
+      "vendors": {
+        "fields": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "dflt_value": null,
+            "pk": 1
+          },
+          {
+            "cid": 1,
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 2,
+            "name": "specialty",
+            "type": "TEXT",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          },
+          {
+            "cid": 3,
+            "name": "lead_days",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 0
+          }
+        ],
+        "foreign_keys": [],
+        "rows": [
+          {
+            "id": 1,
+            "name": "Bulldog Print Co",
+            "specialty": "apparel reprint",
+            "lead_days": 5
+          },
+          {
+            "id": 2,
+            "name": "Elm City Gifts",
+            "specialty": "mugs and small goods",
+            "lead_days": 3
+          },
+          {
+            "id": 3,
+            "name": "QuickShip CT",
+            "specialty": "local courier",
+            "lead_days": 1
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,381 @@
+I am finished with Homework 5 and want you to do a complete final pre-submission audit of the entire HW5 project.
+
+Work ONLY inside the current HW5 folder. The data/ folder is already inside HW5 and contains both campus_customs.db and campus_customs_new.db.
+
+Do not redesign or rewrite working parts just for the sake of changing them. First inspect everything, compare it against the assignment requirements we have been following for Problems 1–11, test the project, and fix only real missing requirements, bugs, broken paths, inconsistencies, or grading risks.
+
+Please audit this like a strict grader.
+
+Check ALL of the following:
+
+1. REQUIRED FILES / STRUCTURE
+Confirm the project contains the expected files and folders, including:
+- AI_prompts.md
+- requirements.txt
+- .env.example
+- .gitignore
+- .mcp.json
+- README.md
+- data/campus_customs.db
+- data/campus_customs_new.db
+- mcp_server/server.py
+- mcp_server/README.md
+- frontend/
+- backend/main.py
+- backend/models.py
+- backend/prompts/boss.md
+- backend/prompts/inventory.md
+- backend/prompts/accounting.md
+- backend/prompts/facilities.md
+- backend/prompts/customer_service.md
+- output/harness.md
+- output/mcp_smoke.json
+- output/desk_tickets.html
+- output/design.md
+- output/resolved_tickets.json
+- output/resolved_board.html
+- output/audit_trail.json
+- output/github_url.txt
+
+Do not delete useful extra files just because they are not listed.
+
+2. PROBLEM 1 — AI PROMPT LOG
+Inspect AI_prompts.md and make sure it contains a section for each problem with:
+- problem number/title
+- the prompt used
+- follow-up prompt when needed
+- short explanation of what was missing after the first prompt when applicable
+
+Keep this truthful to the actual work. Do not invent fake interactions.
+
+3. PROBLEM 2 — DATABASE
+Inspect every table and field in data/campus_customs.db.
+Confirm campus_customs_new.db is the working copy and the original database remains untouched.
+Confirm the three open tickets 101, 102, and 103 are understood and tied correctly to the relevant database records.
+
+Check that output/harness.md accurately documents the database tables and why they matter.
+
+4. PROBLEMS 3–4 — MCP SERVER
+Inspect the MCP server carefully.
+
+It must:
+- use FastMCP
+- read/write data/campus_customs_new.db
+- not modify the original database
+- expose the required MCP tools
+- use real database values only
+- never invent shop facts
+
+Check .mcp.json and make sure the project-level MCP configuration is valid for this project.
+
+Inspect output/mcp_smoke.json and verify there is real evidence for all three initial MCP tools:
+- prompt/request
+- tool name
+- returned value
+- returned values must match campus_customs_new.db
+
+Check mcp_server/README.md and make sure it accurately describes the server and tools.
+
+5. PROBLEM 5 — MULTI-AGENT TEAM
+Confirm there are five distinct PydanticAI agents:
+- Boss
+- Inventory
+- Accounting
+- Facilities
+- Customer Service
+
+Each should have a meaningful role-specific prompt in backend/prompts/.
+
+Confirm full connectivity/delegation is possible where appropriate, while avoiding pointless delegation to every agent.
+
+VERY IMPORTANT:
+Every AI agent must use ONLY gpt-6-Luna through Portkey.
+Search the entire project for any other model references and remove/fix them if they could actually be used.
+
+Do not use gpt-5.6, Astra, Sol, Terra, or any other model.
+
+Confirm the agents obtain shop facts through the MCP server rather than creating a second independent SQL/shop-tool layer that bypasses MCP.
+
+Check backend/models.py for appropriate structured models.
+
+6. SHOP RULES / SAFETY
+Verify the implementation enforces these rules:
+- desk.date_today is the shop's definition of today
+- vendor lead times come from the vendors table
+- vendors cannot ship new product while they have an open unpaid invoice
+- any payment requires human approval
+- agents may PREPARE payments/purchases but may not finalize them without approval
+- the actual approval route performs the payment
+- payments cannot cause a negative cash balance
+- cash only flows OUT in this homework because revenue is not modeled
+- customer emails/messages remain drafts
+- no real vendor calls
+- no real customer emails
+- database values are authoritative
+- agents should not fabricate values
+
+Make safety behavior obvious in both prompts and system documentation.
+
+7. AUDIT TRAIL
+Inspect output/audit_trail.json.
+
+It should be append-only and contain real agent activity from runs, with enough detail to understand:
+- time
+- ticket
+- agent
+- actions/delegations
+- MCP/tool calls
+- short args/results where appropriate
+- stop/final reason
+
+Do not fabricate audit history just to fill the file.
+
+8. PROBLEM 6 — TICKET PLAN
+Open output/desk_tickets.html.
+
+Verify it has:
+- Ticket 101 tab
+- Ticket 102 tab
+- Ticket 103 tab
+- Cash tab
+- Reflection tab
+
+Each ticket should preserve an Expected section that clearly states:
+- which agent the Boss should involve first and why
+- the expected delegation path
+- expected MCP tools
+- no lazy "call every agent" plan unless genuinely required
+
+Keep space / content for Actual results from the completed runs.
+
+9. PROBLEM 7 — FASTAPI BACKEND
+Inspect backend/main.py and test the backend.
+
+From backend/, it should run with:
+
+uvicorn main:app --reload --port 8000
+
+Verify there are working routes for:
+- returning the three tickets and their status
+- running the agent team on a selected ticket
+- returning recent agent events/activity
+- approving a pending payment or purchase
+- returning current checking balance
+- resetting the working database to the original values
+
+Check CORS for the Vite frontend.
+
+Make sure output/harness.md accurately documents the routes.
+
+10. PROBLEM 8 — REACT DASHBOARD
+Inspect and run the frontend.
+
+It should be React + Vite + TypeScript and connect to http://localhost:8000.
+
+Test that the dashboard can:
+- show all three tickets
+- select a ticket
+- start the agent team
+- show live/recent agent activity
+- show which agents are working
+- show what tools/actions occurred
+- mark/show tickets as resolved
+- summarize what each agent did
+- surface human approval when necessary
+- allow the human to approve a payment/purchase
+- show the checking balance
+- reflect cash changes after approval
+
+Check for broken requests, console errors, rendering issues, bad loading behavior, and obvious UX bugs.
+
+Preserve the design direction:
+minimalist, calm, premium, aesthetically relaxing, polished, and easy to scan.
+Do not turn it into a loud or cluttered dashboard.
+
+If small visual fixes are genuinely needed, make them tasteful and restrained.
+
+Verify output/design.md accurately describes the ACTUAL dashboard design and why the choices help a human operator.
+
+11. PROBLEM 9 — FULL TICKET RUN
+This is critical.
+
+Before validating the final run:
+- restore/reset campus_customs_new.db from campus_customs.db
+- record the starting checking balance
+
+Then verify that tickets 101, 102, and 103 can be run and resolved correctly.
+
+Human approval MUST occur wherever money is actually paid.
+
+Verify:
+- ticket outcomes
+- agent participation
+- delegation
+- MCP calls
+- database updates
+- approvals
+- ticket statuses
+- cash effects
+
+Then verify the ending checking balance directly against the cash_accounts table.
+
+The Cash tab of output/desk_tickets.html must show:
+- starting checking balance
+- cash impact of each ticket
+- exact reason for each change
+- payment/purchase amount
+- ending checking balance
+
+The arithmetic must reconcile exactly to the working database.
+
+12. FINAL OUTPUTS
+Verify output/resolved_tickets.json contains all three tickets with:
+- id
+- final status
+- short outcome
+- agent contributions
+- human approvals where applicable
+
+Verify output/resolved_board.html is easy to open and grade and includes evidence/screenshots of the final board for tickets 101, 102, and 103.
+
+Verify all relative asset paths work when the HTML file is opened locally.
+
+13. PROBLEM 10 — REFLECTION
+Inspect the Reflection tab in output/desk_tickets.html.
+
+It must specifically discuss THIS project and THESE three tickets, not generic multi-agent AI commentary.
+
+Make sure it covers:
+- performance on each ticket
+- Expected vs Actual for each ticket and why they differed
+- what would have been simpler with one agent + tools and why
+- three new Campus Customs problems the current team/tools could solve
+- three new problems it could NOT solve yet
+- what new agents/tools would be required for those
+
+Keep the writing natural and specific.
+
+14. HARNESS
+Do a final completeness pass on output/harness.md.
+
+It should coherently explain:
+- database/tables
+- MCP tools
+- five agents
+- role responsibilities
+- delegation
+- model choice
+- safety rules
+- approval flow
+- audit trail
+- FastAPI routes
+- dashboard behavior
+- limits / cost-control choices
+- how to run the system
+
+15. README
+Treat README.md as if a grader cloned the repository onto a new machine.
+
+It should clearly explain:
+- Python setup
+- dependency installation
+- frontend dependency installation
+- .env setup
+- PORTKEY_API_KEY
+- resetting/copying the original DB to the working DB
+- starting the MCP server
+- starting FastAPI
+- starting the React frontend
+- doing a clean three-ticket run
+- where outputs are located
+
+Commands should actually match the repository.
+
+16. REQUIREMENTS
+Check requirements.txt against actual Python imports.
+
+Add missing packages if necessary and remove obviously wrong ones only if safe.
+
+Do not pin bizarre/unnecessary dependencies.
+
+17. SECRETS / GIT SAFETY
+Search the project for secrets.
+
+The real .env must NOT be committed.
+.env.example must contain placeholders only.
+
+Make sure no actual API key appears anywhere in:
+- Python
+- TypeScript
+- Markdown
+- JSON
+- HTML
+- Git history-visible project files
+
+IMPORTANT FOR HW5:
+Both database files SHOULD be included in the GitHub submission:
+- data/campus_customs.db
+- data/campus_customs_new.db
+
+Do not accidentally ignore them.
+
+18. GITHUB READINESS
+Check .gitignore carefully.
+
+Ignore things such as:
+- .env
+- Python caches
+- virtual environments
+- node_modules
+- frontend build artifacts as appropriate
+
+But keep all assignment-required outputs and both databases.
+
+Do NOT push anything to GitHub yet unless I explicitly tell you to.
+
+19. RUNTIME TESTS
+Run as many safe local tests as possible.
+
+Check:
+- Python syntax/imports
+- MCP server
+- backend startup
+- required API routes
+- frontend build
+- TypeScript build
+- integration between frontend/backend
+- database reset
+- cash calculations
+- output files
+
+Do not spend API money unnecessarily. Use the smallest number of AI calls needed for verification.
+
+20. FINAL RESPONSE
+After auditing and fixing legitimate issues, give me a concise grader-style report:
+
+PASS / FAIL for:
+- Problems 1–11
+- folder structure
+- database integrity
+- MCP
+- agents
+- gpt-6-Luna-only requirement
+- safety
+- human approval
+- backend
+- frontend
+- ticket resolution
+- cash reconciliation
+- output evidence
+- secrets
+- GitHub readiness
+
+Then tell me:
+1. Exactly what you changed
+2. Anything you could not automatically verify
+3. Any manual actions I still need to do before submission
+4. Whether you believe the project is ready to submit
+
+Do not claim something passed unless you actually inspected or tested it.
+Do not fabricate screenshots, API runs, agent runs, database results, or audit records.
+Do not make unnecessary architectural changes at this stage.

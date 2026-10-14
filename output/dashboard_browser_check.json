@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-14T17:44:43.430Z",
+  "backend": "http://127.0.0.1:8001",
+  "frontend": "http://127.0.0.1:5173",
+  "note": "Separate local validation server; same real working DB and audit. No agents run or payments performed.",
+  "captures": [
+    {
+      "ticket_id": 101,
+      "status": "Resolved",
+      "checking": 160,
+      "file": "dashboard_screenshots/ticket-101.png"
+    },
+    {
+      "ticket_id": 102,
+      "status": "Resolved",
+      "checking": 160,
+      "file": "dashboard_screenshots/ticket-102.png"
+    },
+    {
+      "ticket_id": 103,
+      "status": "Resolved",
+      "checking": 160,
+      "file": "dashboard_screenshots/ticket-103.png"
+    }
+  ],
+  "mobile_width": 390,
+  "mobile_no_overflow": true,
+  "reload_summary_visible": true,
+  "standalone_tabs_passed": 5,
+  "runtime_exceptions": []
+}
